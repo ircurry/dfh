@@ -31,7 +31,7 @@
         }:
         {
           devenv.shells.default = {
-            packages = with pkgs; [ just ];
+            packages = with pkgs; [ just gopls ];
             languages.nix.enable = true;
             languages.go.enable = true;
           };
