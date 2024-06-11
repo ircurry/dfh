@@ -4,90 +4,88 @@ import (
 	"fmt"
 	"net"
 	"os"
-	"sync"
 )
 
-func listenEvents(con *net.Conn, lim int, ch chan string, wg *sync.WaitGroup) {
-    defer wg.Done()
+func listenEvents(con *net.Conn, lim int, ch chan string) {
     b := make([]byte, 1)
-    c := 0
-    
-    for {
-	wg.Add(1)
-	if c >= lim {
-	    wg.Done()
-	    break
-	}
-	(*con).Read(b)
-	str := string(b[:])
-	if str == "\n" {
-	    c++
-	}
-	ch <- str
-	wg.Done()
+    str := ""
+
+    for i := 0; (i < lim) || (lim <= 0); i++{
+		for {
+			(*con).Read(b)
+			str = str + string(b[:])
+			if string(b[:]) == "\n" {
+				break
+			}
+		}
+		ch <- str
+		str = ""
     }
 
     close(ch)
     return
 }
 
-func printStream(ch chan string, wg *sync.WaitGroup) {
-    defer wg.Done()
+func printEvents(ch chan string) {
     for {
-	wg.Add(1)
-	msg, ok := <-ch
-	if !ok {
-	    wg.Done()
-	    break
-	}
-	fmt.Print(msg)
-	wg.Done()
+		msg, ok := <-ch
+		if !ok {
+			break
+		}
+		fmt.Print(msg)
     }
     return
 }
 
-func printMessages(conn *net.Conn, lim int, ch chan string, wg *sync.WaitGroup) {
-    wg.Add(2)
-    defer wg.Done()
-    go printStream(ch, wg)
-    go listenEvents(conn, lim, ch, wg)
-    return
+func hyprMessage(con *net.Conn, msg string) {
+    _, err := (*con).Write([]byte(msg + "\n"))
+    if err != nil {
+		panic(err)
+    }
 }
 
-// func hyprMessage()
-
-func main() {
+func getHyprDir() string {
     var xdgRunDir, his string
     var ok bool
     xdgRunDir, ok = os.LookupEnv("XDG_RUNTIME_DIR")
     if !ok {
-	panic("XDG_RUNTIME_DIR not found")
+		panic("XDG_RUNTIME_DIR not found")
     }
     
     his, ok = os.LookupEnv("HYPRLAND_INSTANCE_SIGNATURE")
     if !ok {
-	panic("HYPRLAND_INSTANCE_SIGNATURE not found")
+		panic("HYPRLAND_INSTANCE_SIGNATURE not found")
     }
     
-    hyprDir := xdgRunDir + "/hypr/" + his
-    // sock1, err := net.Dial("unix", hyprDir + "/.socket.sock")
-    // if err != nil {
-    // 	panic(err)
-    // }
+    return xdgRunDir + "/hypr/" + his
+}
+
+func getHyprCtlSocket() (net.Conn) {
+    hyprDir := getHyprDir()
+    sock1, err := net.Dial("unix", hyprDir + "/.socket.sock")
+    if err != nil {
+		panic(err)
+    }
+    return sock1
+}
+
+func getEventSocket() (net.Conn) {
+    hyprDir := getHyprDir()
     sock2, err := net.Dial("unix", hyprDir + "/.socket2.sock")
     if err != nil {
-	panic(err)
+		panic(err)
     }
+    return sock2
+}
 
-    // _, err = sock1.Write([]byte("dispatch exec alacritty\n"))
-    // if err != nil {
-    // 	panic(err)
-    // }
+func main() {
+    // hyprCtlSock := getHyprCtlSocket()
+    // hyprMessage(&hyprCtlSock, "dispatch exec firefox")
 
-    var wg sync.WaitGroup
-    wg.Add(1)
+    
+    eventSock := getEventSocket()
     ch := make(chan string, 20)
-    printMessages(&sock2, 20, ch, &wg)
-    wg.Wait()
+    go listenEvents(&eventSock, 20, ch)
+    printEvents(ch)
     return
 }
