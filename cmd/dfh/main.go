@@ -79,13 +79,15 @@ func getEventSocket() (net.Conn) {
 }
 
 func main() {
-    // hyprCtlSock := getHyprCtlSocket()
-    // hyprMessage(&hyprCtlSock, "dispatch exec firefox")
+    hyprCtlSock := getHyprCtlSocket()
+    hyprMessage(&hyprCtlSock, "dispatch exec firefox")
 
-    
-    eventSock := getEventSocket()
-    ch := make(chan string, 20)
-    go listenEvents(&eventSock, 20, ch)
-    printEvents(ch)
+    // eventSock := getEventSocket()
+    // ch := make(chan string, 20)
+    // go listenEvents(&eventSock, 0, ch)
+    // printEvents(ch)
+
+	// fmt.Println(getHyprDir())
+	
     return
 }
