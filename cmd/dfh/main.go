@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net"
 	"os"
@@ -79,15 +80,28 @@ func getEventSocket() (net.Conn) {
 }
 
 func main() {
-    hyprCtlSock := getHyprCtlSocket()
-    hyprMessage(&hyprCtlSock, "dispatch exec firefox")
+	lsnCmd := flag.NewFlagSet("spawn", flag.ExitOnError)
+	lsnNum := lsnCmd.Int("n", 0, "a zero or positive number for how many events to listen to and print")
 
-    // eventSock := getEventSocket()
-    // ch := make(chan string, 20)
-    // go listenEvents(&eventSock, 0, ch)
-    // printEvents(ch)
-
-	// fmt.Println(getHyprDir())
+	if (len(os.Args) > 1) {
+		switch os.Args[1] {
+		case "dir":
+			fmt.Printf("Hyprland dir: %s\n", getHyprDir())
+			return
+		case "spwn":
+			hyprCtlSock := getHyprCtlSocket()
+			hyprMessage(&hyprCtlSock, "dispatch exec " + os.Args[2])
+			return
+		case "lsn":
+			eventSock := getEventSocket()
+			lsnCmd.Parse(os.Args[2:])
+			ch := make(chan string)
+			go listenEvents(&eventSock, *lsnNum, ch)
+			printEvents(ch)
+			return
+		}
+	}
 	
+	fmt.Fprintln(os.Stderr, "Error: no valid sub command given as first argument")
     return
 }
