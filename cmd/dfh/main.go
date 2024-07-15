@@ -7,25 +7,25 @@ import (
 	"os"
 )
 
-type monitor struct {
-	name string
-	width int64
-	height int64
-	refreshRate int
-	x int64
-	y int64
-	scale int
-	state string
+type Monitor struct {
+	Name string `json:"name"`
+	Width int64 `json:"width"`
+	Height int64 `json:"height"`
+	RefreshRate int `json:"refreshRate"`
+	X int64 `json:"x"`
+	Y int64 `json:"y"`
+	Scale int `json:"scale"`
+	State string `json:"state"`
 };
 
-func (mon *monitor) String() string {
+func (mon *Monitor) String() string {
 	hyprstring := fmt.Sprintf("%s,%dx%d,%dx%d@%d,%d",
-		mon.name, mon.height, mon.width, mon.x, mon.y, mon.refreshRate, mon.scale)
+		mon.Name, mon.Height, mon.Width, mon.X, mon.Y, mon.RefreshRate, mon.Scale)
 	return hyprstring
 }
 
-func (mon *monitor) DisableString() string {
-	hyprstring := fmt.Sprintf("%s,disable", mon.name)
+func (mon *Monitor) DisableString() string {
+	hyprstring := fmt.Sprintf("%s,disable", mon.Name)
 	return hyprstring
 }
 
