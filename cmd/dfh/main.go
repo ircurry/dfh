@@ -37,10 +37,10 @@ func listenEvents(con *net.Conn, lim int, ch chan string) {
     for i := 0; (i < lim) || (lim <= 0); i++{
 		for {
 			(*con).Read(b)
-			str = str + string(b[:])
 			if string(b[:]) == "\n" {
 				break
 			}
+			str = str + string(b[:])
 		}
 		ch <- str
 		str = ""
@@ -56,7 +56,7 @@ func printEvents(ch chan string) {
 		if !ok {
 			break
 		}
-		fmt.Print(msg)
+		fmt.Println(msg)
     }
     return
 }
