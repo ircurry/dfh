@@ -104,6 +104,7 @@ func getEventSocket() (net.Conn) {
 
 func main() {
 	lsnCmd := flag.NewFlagSet("spawn", flag.ExitOnError)
+	// TODO: Document Negative numbers being the same as 0
 	lsnNum := lsnCmd.Int("n", 0, "a zero or positive number for how many events to listen to and print")
 
 	if (len(os.Args) > 1) {
