@@ -7,6 +7,29 @@ import (
 	"os"
 )
 
+type monitor struct {
+	name string
+	width int64
+	height int64
+	refreshRate int
+	x int64
+	y int64
+	scale int
+	state string
+};
+
+func (mon *monitor) String() string {
+	hyprstring := fmt.Sprintf("%s,%dx%d,%dx%d@%d,%d",
+		mon.name, mon.height, mon.width, mon.x, mon.y, mon.refreshRate, mon.scale)
+	return hyprstring
+}
+
+func (mon *monitor) DisableString() string {
+	hyprstring := fmt.Sprintf("%s,disable", mon.name)
+	return hyprstring
+}
+
+
 func listenEvents(con *net.Conn, lim int, ch chan string) {
     b := make([]byte, 1)
     str := ""
