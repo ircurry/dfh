@@ -61,8 +61,8 @@ func printEvents(ch chan string) {
     return
 }
 
-func hyprMessage(con *net.Conn, msg string) {
-    _, err := (*con).Write([]byte(msg + "\n"))
+func hyprMessage(con net.Conn, msg string) {
+    _, err := con.Write([]byte(msg + "\n"))
     if err != nil {
 		panic(err)
     }
@@ -113,7 +113,7 @@ func main() {
 			return
 		case "spwn":
 			hyprCtlSock := getHyprCtlSocket()
-			hyprMessage(&hyprCtlSock, "dispatch exec " + os.Args[2])
+			hyprMessage(hyprCtlSock, "dispatch exec " + os.Args[2])
 			return
 		case "lsn":
 			eventSock := getEventSocket()
