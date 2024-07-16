@@ -177,6 +177,7 @@ func main() {
 
 	if (len(os.Args) > 1) {
 		switch os.Args[1] {
+		// TODO: make an IPC monitor parser to tell what monitors are attached
 		case "mons":
 			// hyprCtlSock := getHyprCtlSocket()
 			monsCmd.Parse(os.Args[2:])
