@@ -7,14 +7,14 @@ import (
 )
 
 type Monitor struct {
-	Name        string `json:"name"`
-	Width       int64  `json:"width"`
-	Height      int64  `json:"height"`
-	RefreshRate int    `json:"refreshRate"`
-	X           int64  `json:"x"`
-	Y           int64  `json:"y"`
-	Scale       int    `json:"scale"`
-	State       string `json:"state"`
+	Name        *string `json:"name"`
+	Width       *int64  `json:"width"`
+	Height      *int64  `json:"height"`
+	RefreshRate *int    `json:"refreshRate"`
+	X           *int64  `json:"x"`
+	Y           *int64  `json:"y"`
+	Scale       *int    `json:"scale"`
+	State       *string `json:"state"`
 }
 
 func (mon *Monitor) String() string {
@@ -25,15 +25,50 @@ func (mon *Monitor) String() string {
 	return string(val)
 }
 
-func (mon *Monitor) EnableString() string {
-	hyprstring := fmt.Sprintf("%s,%dx%d,%dx%d@%d,%d",
-		mon.Name, mon.Width, mon.Height, mon.X, mon.Y, mon.RefreshRate, mon.Scale)
-	return hyprstring
+func (mon *Monitor) CheckFields() error {
+	switch v:= true; v {
+	case (mon.Name == nil):
+		return fmt.Errorf("cannot format string, Name is nil.")
+	case (mon.Width == nil):
+		return fmt.Errorf("cannot format string, Width is nil.")
+	case (mon.Height == nil):
+		return fmt.Errorf("cannot format string, Height is nil.")
+	case (mon.RefreshRate == nil):
+		return fmt.Errorf("cannot format string, Refresh Rate is nil.")
+	case (mon.X == nil):
+		return fmt.Errorf("cannot format string, X Position is nil.")
+	case (mon.Y == nil):
+		return fmt.Errorf("cannot format string, Y Position is nil.")
+	case (mon.Scale == nil):
+		return fmt.Errorf("cannot format string, Scale is nil.")
+	case (mon.Scale == nil):
+			return fmt.Errorf("cannont use monitor cofiguration, does not contain a State")
+	default:
+		return nil
+	}
 }
 
-func (mon *Monitor) DisableString() string {
-	hyprstring := fmt.Sprintf("%s,disable", mon.Name)
-	return hyprstring
+func (mon *Monitor) EnableString() (string, error) {
+	var name, resolution, position, scale string
+	if err := mon.CheckFields(); err != nil {
+		return "", err
+	} else {
+		name = *mon.Name
+		resolution = fmt.Sprintf("%dx%d@%d", *mon.Width, *mon.Height, *mon.RefreshRate)
+		position = fmt.Sprintf("%dx%d", *mon.X, *mon.Y)
+		scale = fmt.Sprintf("%d", *mon.Scale)
+	}
+	
+	hyprstring := fmt.Sprintf("%s,%s,%s,%s", name, resolution, position, scale)
+	return hyprstring, nil
+}
+
+func (mon *Monitor) DisableString() (string, error) {
+	if err := mon.CheckFields(); err != nil {
+		return "", err
+	} else {
+		return fmt.Sprintf("%s,disable", *mon.Name), nil
+	}
 }
 
 type MonitorList []Monitor
@@ -49,11 +84,22 @@ func (monlist *MonitorList) stateStrings(state string) ([]string, error) {
 	var stateErr error = nil
 	containsState := false
 	for _, mon := range *monlist {
-		if mon.State == state {
-			enablelist = append(enablelist, mon.EnableString())
+		if mon.State == nil {
+			return nil, fmt.Errorf("a monitor configuration does not contain a state")
+		}
+		if *mon.State == state {
+			str, err := mon.EnableString()
+			if err != nil {
+				return nil, err
+			}
+			enablelist = append(enablelist, str)
 			containsState = true
 		} else {
-			disablelist = append(disablelist, mon.DisableString())
+			str, err := mon.DisableString()
+			if err != nil {
+				return nil, err
+			}
+			disablelist = append(disablelist, str)
 		}
 	}
 
