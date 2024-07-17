@@ -15,7 +15,6 @@ const (
 	CommandExecutionError
 )
 
-
 func Die(message string, exitCode int) {
 	fmt.Fprintln(os.Stderr, message)
 	os.Exit(exitCode)
@@ -34,7 +33,7 @@ func main() {
 	monsCmd := flag.NewFlagSet("monitors", flag.ExitOnError)
 	monsNum := monsCmd.String("f", "", "the json file to read monitor definitions from")
 
-	if (len(os.Args) > 1) {
+	if len(os.Args) > 1 {
 		switch os.Args[1] {
 		// TODO: make an IPC monitor parser to tell what monitors are attached
 		case "mons":
@@ -74,7 +73,7 @@ func main() {
 			return
 		case "spwn":
 			hyprCtlSock := getHyprCtlSocket()
-			hyprMessage(hyprCtlSock, "dispatch exec " + os.Args[2])
+			hyprMessage(hyprCtlSock, "dispatch exec "+os.Args[2])
 			return
 		case "lsn":
 			eventSock := getEventSocket()
@@ -85,7 +84,7 @@ func main() {
 			return
 		}
 	}
-	
+
 	fmt.Fprintln(os.Stderr, "Error: no valid sub command given as first argument")
-    return
+	return
 }

@@ -1,21 +1,21 @@
 package main
 
 import (
-	"fmt"
 	"encoding/json"
+	"fmt"
 	"os"
 )
 
 type Monitor struct {
-	Name string `json:"name"`
-	Width int64 `json:"width"`
-	Height int64 `json:"height"`
-	RefreshRate int `json:"refreshRate"`
-	X int64 `json:"x"`
-	Y int64 `json:"y"`
-	Scale int `json:"scale"`
-	State string `json:"state"`
-};
+	Name        string `json:"name"`
+	Width       int64  `json:"width"`
+	Height      int64  `json:"height"`
+	RefreshRate int    `json:"refreshRate"`
+	X           int64  `json:"x"`
+	Y           int64  `json:"y"`
+	Scale       int    `json:"scale"`
+	State       string `json:"state"`
+}
 
 func (mon *Monitor) String() string {
 	val, err := json.Marshal(mon)
@@ -39,7 +39,7 @@ func (mon *Monitor) DisableString() string {
 type MonitorList []Monitor
 
 func (monlist *MonitorList) fromJson(byt []byte) error {
-	return json.Unmarshal(byt, monlist);
+	return json.Unmarshal(byt, monlist)
 }
 
 func (monlist *MonitorList) stateStrings(state string) ([]string, error) {
