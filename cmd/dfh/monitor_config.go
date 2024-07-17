@@ -25,7 +25,15 @@ func (mon *Monitor) String() string {
 	return string(val)
 }
 
-func (mon *Monitor) CheckFields() error {
+func (mon *Monitor) CheckStateField() error {
+	if mon.State == nil {
+		return fmt.Errorf("cannont use monitor cofiguration, does not contain a State")
+	} else {
+		return nil
+	}
+}
+
+func (mon *Monitor) CheckStringFields() error {
 	switch v:= true; v {
 	case (mon.Name == nil):
 		return fmt.Errorf("cannot format string, Name is nil.")
@@ -41,8 +49,6 @@ func (mon *Monitor) CheckFields() error {
 		return fmt.Errorf("cannot format string, Y Position is nil.")
 	case (mon.Scale == nil):
 		return fmt.Errorf("cannot format string, Scale is nil.")
-	case (mon.Scale == nil):
-			return fmt.Errorf("cannont use monitor cofiguration, does not contain a State")
 	default:
 		return nil
 	}
@@ -50,7 +56,7 @@ func (mon *Monitor) CheckFields() error {
 
 func (mon *Monitor) EnableString() (string, error) {
 	var name, resolution, position, scale string
-	if err := mon.CheckFields(); err != nil {
+	if err := mon.CheckStringFields(); err != nil {
 		return "", err
 	} else {
 		name = *mon.Name
@@ -64,7 +70,7 @@ func (mon *Monitor) EnableString() (string, error) {
 }
 
 func (mon *Monitor) DisableString() (string, error) {
-	if err := mon.CheckFields(); err != nil {
+	if err := mon.CheckStringFields(); err != nil {
 		return "", err
 	} else {
 		return fmt.Sprintf("%s,disable", *mon.Name), nil
@@ -84,8 +90,8 @@ func (monlist *MonitorList) stateStrings(state string) ([]string, error) {
 	var stateErr error = nil
 	containsState := false
 	for _, mon := range *monlist {
-		if mon.State == nil {
-			return nil, fmt.Errorf("a monitor configuration does not contain a state")
+		if err := mon.CheckStateField(); err == nil {
+			return nil, err
 		}
 		if *mon.State == state {
 			str, err := mon.EnableString()
