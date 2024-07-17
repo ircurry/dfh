@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"os/exec"
 )
 
 func listenEvents(con *net.Conn, lim int, ch chan string) {
@@ -76,4 +77,10 @@ func getEventSocket() net.Conn {
 		panic(err)
 	}
 	return sock2
+}
+
+func runHyprctl(args ...string) (output []byte, err error) {
+	cmd := exec.Command("hyprctl", args...)
+	output, err = cmd.Output()
+	return
 }

@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"os/exec"
 )
 
 const (
@@ -59,9 +58,9 @@ func main() {
 				DieErr("Error creating hyprland monitor settings", err, MonitorStateFailure)
 			}
 			for _, str := range stateStrings {
+				fmt.Println(str)
 				// TODO: make this work with just IPC
-				cmd := exec.Command("hyprctl", "keyword", "monitor", str)
-				if output, err := cmd.Output(); err != nil {
+				if output, err := runHyprctl("keyword", "monitor", str); err != nil {
 					DieErr("something went wrong executing hyprctl", err, CommandExecutionError)
 				} else {
 					fmt.Print(string(output))
