@@ -12,8 +12,20 @@ const (
 	ReadFileFailure
 	MonitorConfigParseFailure
 	MonitorStateFailure
+	CommandExecutionError
 )
 
+
+func Die(message string, exitCode int) {
+	fmt.Fprintln(os.Stderr, message)
+	os.Exit(exitCode)
+}
+
+func DieErr(message string, err error, exitCode int) {
+	fmt.Fprintln(os.Stderr, message)
+	fmt.Fprintln(os.Stderr, err.Error())
+	os.Exit(exitCode)
+}
 
 func main() {
 	lsnCmd := flag.NewFlagSet("spawn", flag.ExitOnError)
@@ -30,33 +42,28 @@ func main() {
 			monsCmd.Parse(os.Args[2:])
 			state := monsCmd.Arg(0)
 			if state == "" {
-				fmt.Fprintln(os.Stderr, "No state given")
-				os.Exit(MonitorStateFailure)
+				Die("No state given", MonitorStateFailure)
 			}
 			contents, err := readMonitorConfigFile(*monsNum)
 			if err != nil {
-				fmt.Fprintln(os.Stderr, "Unable to read file.")
-				fmt.Fprintln(os.Stderr, err.Error())
-				os.Exit(ReadFileFailure)
+				DieErr("Unable to read file.", err, ReadFileFailure)
 			}
 			var monl MonitorList
 			err = monl.fromJson(contents)
 			if err != nil {
-				fmt.Fprintln(os.Stderr, "Something went wrong parsing config file")
-				fmt.Fprintln(os.Stderr, err.Error())
-				os.Exit(MonitorConfigParseFailure)
+				DieErr(
+					"Something went wrong parsing config file",
+					err, MonitorConfigParseFailure)
 			}
 			stateStrings, err := monl.stateStrings(state)
 			if err != nil {
-				fmt.Fprintln(os.Stderr, "Error creating hyprland monitor settings")
-				fmt.Fprintln(os.Stderr, err.Error())
-				os.Exit(MonitorStateFailure)
+				DieErr("Error creating hyprland monitor settings", err, MonitorStateFailure)
 			}
 			for _, str := range stateStrings {
 				// TODO: make this work with just IPC
 				cmd := exec.Command("hyprctl", "keyword", "monitor", str)
 				if output, err := cmd.Output(); err != nil {
-					panic(err)
+					DieErr("something went wrong executing hyprctl", err, CommandExecutionError)
 				} else {
 					fmt.Print(string(output))
 				}
