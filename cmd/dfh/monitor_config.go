@@ -90,7 +90,7 @@ func (monlist *MonitorList) stateStrings(state string) ([]string, error) {
 	var stateErr error = nil
 	containsState := false
 	for _, mon := range *monlist {
-		if err := mon.CheckStateField(); err == nil {
+		if err := mon.CheckStateField(); err != nil {
 			return nil, err
 		}
 		if *mon.State == state {
