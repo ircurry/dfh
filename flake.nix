@@ -35,6 +35,10 @@
             languages.nix.enable = true;
             languages.go.enable = true;
           };
+          packages = rec {
+            dfh = pkgs.callPackage ./package.nix { version = "0.1"; };
+            default = dfh;
+          };
         };
     };
 }
