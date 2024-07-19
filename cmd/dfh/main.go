@@ -12,6 +12,7 @@ const (
 	MonitorConfigParseFailure
 	MonitorStateFailure
 	CommandExecutionError
+	InfoRetrevalFailure
 )
 
 func Die(message string, exitCode int) {
@@ -30,7 +31,8 @@ func main() {
 	// TODO: Document Negative numbers being the same as 0
 	lsnNum := lsnCmd.Int("n", 0, "a zero or positive number for how many events to listen to and print")
 	monsCmd := flag.NewFlagSet("monitors", flag.ExitOnError)
-	monsNum := monsCmd.String("f", "", "the json file to read monitor definitions from")
+	monsFile := monsCmd.String("f", "", "the json file to read monitor definitions from")
+	monsAllowUnconnected := monsCmd.Bool("a", false, "allow unconnected monitors to be configured")
 
 	if len(os.Args) > 1 {
 		switch os.Args[1] {
@@ -42,7 +44,7 @@ func main() {
 			if state == "" {
 				Die("No state given", MonitorStateFailure)
 			}
-			contents, err := readMonitorConfigFile(*monsNum)
+			contents, err := readMonitorConfigFile(*monsFile)
 			if err != nil {
 				DieErr("Unable to read file.", err, ReadFileFailure)
 			}
@@ -57,6 +59,26 @@ func main() {
 			if err != nil {
 				DieErr("Error creating hyprland monitor settings", err, MonitorStateFailure)
 			}
+
+			wlrdata, err := wlrRandrJson()
+			if err != nil {
+				DieErr("Something went wrong requesting monitor information", err, CommandExecutionError)
+			}
+			monitorNames, err := wlrRandrGetMonitors(wlrdata)
+			if err != nil {
+				DieErr("Could not get monitor names from program", err, InfoRetrevalFailure)
+			}
+			allMonsPresent, err := compareMonitorLists(monl, monitorNames)
+			if err != nil {
+				DieErr("Monitor name not found", err, MonitorConfigParseFailure)
+			}
+
+			if !(allMonsPresent || *monsAllowUnconnected) {
+				monsCmd.Usage()
+				Die("Not all monitors in config are present. Consider using the flag -a",
+					InfoRetrevalFailure)
+			}
+
 			for _, str := range stateStrings {
 				fmt.Println(str)
 				// TODO: make this work with just IPC
@@ -80,6 +102,20 @@ func main() {
 			ch := make(chan string)
 			go listenEvents(&eventSock, *lsnNum, ch)
 			printEvents(ch)
+			return
+		case "test":
+			data, err := wlrRandrJson()
+			if err != nil {
+				DieErr("Something Went Wrong", err, 25)
+			}
+			names, err := wlrRandrGetMonitors(data)
+			if err != nil {
+				DieErr("Something Went Wrong", err, 26)
+			}
+			for _, name := range names {
+				fmt.Println(name)
+			}
+
 			return
 		}
 	}

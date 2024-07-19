@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"slices"
 )
 
 type Monitor struct {
@@ -136,4 +137,17 @@ func readMonitorConfigFile(file string) ([]byte, error) {
 		fileContents, err := os.ReadFile(file)
 		return fileContents, err
 	}
+}
+
+func compareMonitorLists (monl MonitorList, names []string) (bool, error) {
+	cont := true
+	for _, val := range monl {
+		if val.Name == nil {
+			return false, fmt.Errorf("monitor has Name nil")
+		}
+		if !slices.Contains(names, *val.Name) {
+			cont = false
+		}
+	}
+	return cont, nil
 }
