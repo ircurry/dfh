@@ -1,5 +1,5 @@
 {
-  description = "Minimal flake for Go development";
+  description = "A helper utility for my desktop";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
