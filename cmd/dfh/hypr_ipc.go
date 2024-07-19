@@ -104,7 +104,7 @@ func wlrRandrGetMonitors(data []byte) ([]string, error) {
 	if !ok {
 		return nil, fmt.Errorf("Not a Set or Array")
 	}
-	switch (delim) {
+	switch delim {
 	case '[':
 		isArray = true
 	case '{':

@@ -35,7 +35,7 @@ func (mon *Monitor) CheckStateField() error {
 }
 
 func (mon *Monitor) CheckStringFields() error {
-	switch v:= true; v {
+	switch v := true; v {
 	case (mon.Name == nil):
 		return fmt.Errorf("cannot format string, Name is nil.")
 	case (mon.Width == nil):
@@ -65,7 +65,7 @@ func (mon *Monitor) EnableString() (string, error) {
 		position = fmt.Sprintf("%dx%d", *mon.X, *mon.Y)
 		scale = fmt.Sprintf("%d", *mon.Scale)
 	}
-	
+
 	hyprstring := fmt.Sprintf("%s,%s,%s,%s", name, resolution, position, scale)
 	return hyprstring, nil
 }
@@ -139,7 +139,7 @@ func readMonitorConfigFile(file string) ([]byte, error) {
 	}
 }
 
-func compareMonitorLists (monl MonitorList, names []string) (bool, error) {
+func compareMonitorLists(monl MonitorList, names []string) (bool, error) {
 	cont := true
 	for _, val := range monl {
 		if val.Name == nil {
