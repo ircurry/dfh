@@ -1,4 +1,4 @@
-package main
+package monitors
 
 import (
 	"encoding/json"
@@ -80,11 +80,11 @@ func (mon *Monitor) DisableString() (string, error) {
 
 type MonitorList []Monitor
 
-func (monlist *MonitorList) fromJson(byt []byte) error {
+func (monlist *MonitorList) FromJson(byt []byte) error {
 	return json.Unmarshal(byt, monlist)
 }
 
-func (monlist *MonitorList) stateStrings(state string) ([]string, error) {
+func (monlist *MonitorList) StateStrings(state string) ([]string, error) {
 	strlist := make([]string, 0)
 	enablelist := make([]string, 0)
 	disablelist := make([]string, 0)
@@ -124,7 +124,7 @@ func (monlist *MonitorList) stateStrings(state string) ([]string, error) {
 	return strlist, stateErr
 }
 
-func readMonitorConfigFile(file string) ([]byte, error) {
+func ReadMonitorConfigFile(file string) ([]byte, error) {
 	switch file {
 	case "":
 		configDir, err := os.UserConfigDir()
@@ -139,7 +139,7 @@ func readMonitorConfigFile(file string) ([]byte, error) {
 	}
 }
 
-func compareMonitorLists(monl MonitorList, names []string) (bool, error) {
+func CompareMonitorLists(monl MonitorList, names []string) (bool, error) {
 	cont := true
 	for _, val := range monl {
 		if val.Name == nil {

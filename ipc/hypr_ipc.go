@@ -1,4 +1,4 @@
-package main
+package ipc
 
 import (
 	"encoding/json"
@@ -9,13 +9,13 @@ import (
 	"strings"
 )
 
-func listenEvents(con *net.Conn, lim int, ch chan string) {
+func listenEvents(con net.Conn, lim int, ch chan string) {
 	b := make([]byte, 1)
 	str := ""
 
 	for i := 0; (i < lim) || (lim <= 0); i++ {
 		for {
-			(*con).Read(b)
+			con.Read(b)
 			if string(b[:]) == "\n" {
 				break
 			}
@@ -40,11 +40,24 @@ func printEvents(ch chan string) {
 	return
 }
 
-func hyprMessage(con net.Conn, msg string) {
+func HyprPrintEvents(num int) {
+	ch := make(chan string)
+	go listenEvents(getEventSocket(), num, ch)
+	printEvents(ch)
+	return
+}
+
+func sendMessage(con net.Conn, msg string) {
 	_, err := con.Write([]byte(msg + "\n"))
 	if err != nil {
 		panic(err)
 	}
+	return
+}
+
+func HyprMessage(msg string) {
+	sendMessage(getHyprCtlSocket(), msg)
+	return
 }
 
 func getHyprDir() string {
@@ -81,19 +94,19 @@ func getEventSocket() net.Conn {
 	return sock2
 }
 
-func runHyprctl(args ...string) (output []byte, err error) {
+func RunHyprctl(args ...string) (output []byte, err error) {
 	cmd := exec.Command("hyprctl", args...)
 	output, err = cmd.Output()
 	return
 }
 
-func wlrRandrJson() (output []byte, err error) {
+func WlrRandrJson() (output []byte, err error) {
 	cmd := exec.Command("wlr-randr", "--json")
 	output, err = cmd.Output()
 	return
 }
 
-func wlrRandrGetMonitors(data []byte) ([]string, error) {
+func WlrRandrGetMonitors(data []byte) ([]string, error) {
 	dec := json.NewDecoder(strings.NewReader(string(data)))
 	isArray := false
 	tkn, err := dec.Token()

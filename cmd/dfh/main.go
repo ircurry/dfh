@@ -1,6 +1,8 @@
 package main
 
 import (
+	"github.com/ircurry/dfh/monitors"
+	"github.com/ircurry/dfh/ipc"
 	"flag"
 	"fmt"
 	"os"
@@ -44,31 +46,31 @@ func main() {
 			if state == "" {
 				Die("No state given", MonitorStateFailure)
 			}
-			contents, err := readMonitorConfigFile(*monsFile)
+			contents, err := monitors.ReadMonitorConfigFile(*monsFile)
 			if err != nil {
 				DieErr("Unable to read file.", err, ReadFileFailure)
 			}
-			var monl MonitorList
-			err = monl.fromJson(contents)
+			var monl monitors.MonitorList
+			err = monl.FromJson(contents)
 			if err != nil {
 				DieErr(
 					"Something went wrong parsing config file",
 					err, MonitorConfigParseFailure)
 			}
-			stateStrings, err := monl.stateStrings(state)
+			stateStrings, err := monl.StateStrings(state)
 			if err != nil {
 				DieErr("Error creating hyprland monitor settings", err, MonitorStateFailure)
 			}
 
-			wlrdata, err := wlrRandrJson()
+			wlrdata, err := ipc.WlrRandrJson()
 			if err != nil {
 				DieErr("Something went wrong requesting monitor information", err, CommandExecutionError)
 			}
-			monitorNames, err := wlrRandrGetMonitors(wlrdata)
+			monitorNames, err := ipc.WlrRandrGetMonitors(wlrdata)
 			if err != nil {
 				DieErr("Could not get monitor names from program", err, InfoRetrevalFailure)
 			}
-			allMonsPresent, err := compareMonitorLists(monl, monitorNames)
+			allMonsPresent, err := monitors.CompareMonitorLists(monl, monitorNames)
 			if err != nil {
 				DieErr("Monitor name not found", err, MonitorConfigParseFailure)
 			}
@@ -82,33 +84,25 @@ func main() {
 			for _, str := range stateStrings {
 				fmt.Println(str)
 				// TODO: make this work with just IPC
-				if output, err := runHyprctl("keyword", "monitor", str); err != nil {
+				if output, err := ipc.RunHyprctl("keyword", "monitor", str); err != nil {
 					DieErr("something went wrong executing hyprctl", err, CommandExecutionError)
 				} else {
 					fmt.Print(string(output))
 				}
 			}
 			return
-		case "dir":
-			fmt.Printf("Hyprland dir: %s\n", getHyprDir())
-			return
 		case "spwn":
-			hyprCtlSock := getHyprCtlSocket()
-			hyprMessage(hyprCtlSock, "dispatch exec "+os.Args[2])
+			ipc.HyprMessage("dispatch exec "+os.Args[2])
 			return
 		case "lsn":
-			eventSock := getEventSocket()
-			lsnCmd.Parse(os.Args[2:])
-			ch := make(chan string)
-			go listenEvents(&eventSock, *lsnNum, ch)
-			printEvents(ch)
+			ipc.HyprPrintEvents(*lsnNum)
 			return
 		case "test":
-			data, err := wlrRandrJson()
+			data, err := ipc.WlrRandrJson()
 			if err != nil {
 				DieErr("Something Went Wrong", err, 25)
 			}
-			names, err := wlrRandrGetMonitors(data)
+			names, err := ipc.WlrRandrGetMonitors(data)
 			if err != nil {
 				DieErr("Something Went Wrong", err, 26)
 			}
