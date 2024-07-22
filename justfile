@@ -21,6 +21,18 @@ goformat:
 	for x in {{ cmds }}; do go fmt {{ gomodule }}/cmd/$x; done
 alias gf := goformat
 
+# test 'cmd' files using go test
+[group('test')]
+gotestpkg pkg:
+	go test {{ pkg }}
+alias gtpkg := gotestpkg
+
+# test all go command files using go test
+[group('test')]
+gotest:
+	go test ./...
+alias gt := gotest
+
 # build 'cmd' using go build
 [group('build')]
 gobuildcmd cmd:
