@@ -28,6 +28,13 @@ func DieErr(message string, err error, exitCode int) {
 	os.Exit(exitCode)
 }
 
+func DieIfErr(message string, err error, exitCode int) {
+	if err != nil {
+		DieErr(message, err, exitCode)
+	}
+	return
+}
+
 func main() {
 	lsnCmd := flag.NewFlagSet("spawn", flag.ExitOnError)
 	// TODO: Document Negative numbers being the same as 0
@@ -47,33 +54,20 @@ func main() {
 				Die("No state given", MonitorStateFailure)
 			}
 			contents, err := monitors.ReadMonitorConfigFile(*monsFile)
-			if err != nil {
-				DieErr("Unable to read file.", err, ReadFileFailure)
-			}
+			DieIfErr("Unable to read file.", err, ReadFileFailure)
 			var monl monitors.MonitorList
 			err = monl.FromJson(contents)
-			if err != nil {
-				DieErr(
-					"Something went wrong parsing config file",
-					err, MonitorConfigParseFailure)
-			}
+			DieIfErr("Something went wrong parsing config file",
+				err, MonitorConfigParseFailure)
 			stateStrings, err := monl.StateStrings(state)
-			if err != nil {
-				DieErr("Error creating hyprland monitor settings", err, MonitorStateFailure)
-			}
+			DieIfErr("Error creating hyprland monitor settings", err, MonitorStateFailure)
 
 			wlrdata, err := ipc.WlrRandrJson()
-			if err != nil {
-				DieErr("Something went wrong requesting monitor information", err, CommandExecutionError)
-			}
+			DieIfErr("Something went wrong requesting monitor information", err, CommandExecutionError)
 			monitorNames, err := ipc.WlrRandrGetMonitors(wlrdata)
-			if err != nil {
-				DieErr("Could not get monitor names from program", err, InfoRetrevalFailure)
-			}
+			DieIfErr("Could not get monitor names from program", err, InfoRetrevalFailure)
 			allMonsPresent, err := monitors.CompareMonitorLists(monl, monitorNames)
-			if err != nil {
-				DieErr("Monitor name not found", err, MonitorConfigParseFailure)
-			}
+			DieIfErr("Monitor name not found", err, MonitorConfigParseFailure)
 
 			if !(allMonsPresent || *monsAllowUnconnected) {
 				monsCmd.Usage()
@@ -99,13 +93,9 @@ func main() {
 			return
 		case "test":
 			data, err := ipc.WlrRandrJson()
-			if err != nil {
-				DieErr("Something Went Wrong", err, 25)
-			}
+			DieIfErr("Something Went Wrong", err, 25)
 			names, err := ipc.WlrRandrGetMonitors(data)
-			if err != nil {
-				DieErr("Something Went Wrong", err, 26)
-			}
+			DieIfErr("Something Went Wrong", err, 26)
 			for _, name := range names {
 				fmt.Println(name)
 			}
