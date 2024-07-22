@@ -1,11 +1,12 @@
 package main
 
 import (
-	"github.com/ircurry/dfh/monitors"
-	"github.com/ircurry/dfh/ipc"
 	"flag"
 	"fmt"
 	"os"
+
+	"github.com/ircurry/dfh/ipc"
+	"github.com/ircurry/dfh/monitors"
 )
 
 const (
@@ -59,7 +60,7 @@ func main() {
 			err = monl.FromJson(contents)
 			DieIfErr("Something went wrong parsing config file",
 				err, MonitorConfigParseFailure)
-			stateStrings, err := monl.StateStrings(state)
+			stateStrings, err := ipc.StateStrings(monl, state)
 			DieIfErr("Error creating hyprland monitor settings", err, MonitorStateFailure)
 
 			wlrdata, err := ipc.WlrRandrJson()

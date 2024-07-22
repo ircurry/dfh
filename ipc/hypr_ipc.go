@@ -5,7 +5,54 @@ import (
 	"net"
 	"os"
 	"os/exec"
+
+	"github.com/ircurry/dfh/monitors"
 )
+
+func hyprMonString(mon monitors.Monitor, state string) (string, bool, error) {
+	if err := mon.CheckStringFields(); err != nil {
+		return "", false, err
+	}
+	if err := mon.CheckStringFields(); err != nil {
+		return "", false, err
+	}
+	if *mon.State == state {
+		var name, resolution, position, scale string
+
+		name = *mon.Name
+		resolution = fmt.Sprintf("%dx%d@%d", *mon.Width, *mon.Height, *mon.RefreshRate)
+		position = fmt.Sprintf("%dx%d", *mon.X, *mon.Y)
+		scale = fmt.Sprintf("%d", *mon.Scale)
+
+		hyprstring := fmt.Sprintf("%s,%s,%s,%s", name, resolution, position, scale)
+		return hyprstring, true, nil
+	} else {
+		return fmt.Sprintf("%s,disable", *mon.Name), false, nil
+	}
+
+}
+
+func StateStrings(monlist monitors.MonitorList, state string) ([]string, error) {
+	strlist := make([]string, 0)
+	var stateErr error = nil
+	containsState := false
+	for _, mon := range monlist {
+		if str, isState, err := hyprMonString(mon, state); err != nil {
+			return nil, err
+		} else {
+			strlist = append(strlist, str)
+			if isState {
+				containsState = true
+			}
+		}
+	}
+
+	if !containsState {
+		stateErr = fmt.Errorf("this monitor configuration does not contain state: %s", state)
+	}
+
+	return strlist, stateErr
+}
 
 func listenEvents(con net.Conn, lim int, ch chan string) {
 	b := make([]byte, 1)
