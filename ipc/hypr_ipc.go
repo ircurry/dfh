@@ -9,13 +9,7 @@ import (
 	"github.com/ircurry/dfh/monitors"
 )
 
-func hyprMonString(mon monitors.Monitor, state string) (string, bool, error) {
-	if err := mon.CheckStringFields(); err != nil {
-		return "", false, err
-	}
-	if err := mon.CheckStringFields(); err != nil {
-		return "", false, err
-	}
+func hyprMonString(mon monitors.Monitor, state string) (string, bool) {
 	if *mon.State == state {
 		var name, resolution, position, scale string
 
@@ -25,9 +19,9 @@ func hyprMonString(mon monitors.Monitor, state string) (string, bool, error) {
 		scale = fmt.Sprintf("%d", *mon.Scale)
 
 		hyprstring := fmt.Sprintf("%s,%s,%s,%s", name, resolution, position, scale)
-		return hyprstring, true, nil
+		return hyprstring, true
 	} else {
-		return fmt.Sprintf("%s,disable", *mon.Name), false, nil
+		return fmt.Sprintf("%s,disable", *mon.Name), false
 	}
 
 }
@@ -37,13 +31,10 @@ func StateStrings(monlist monitors.MonitorList, state string) ([]string, error) 
 	var stateErr error = nil
 	containsState := false
 	for _, mon := range monlist {
-		if str, isState, err := hyprMonString(mon, state); err != nil {
-			return nil, err
-		} else {
-			strlist = append(strlist, str)
-			if isState {
-				containsState = true
-			}
+		str, isState := hyprMonString(mon, state)
+		strlist = append(strlist, str)
+		if isState {
+			containsState = true
 		}
 	}
 

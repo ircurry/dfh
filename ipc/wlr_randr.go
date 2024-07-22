@@ -15,16 +15,7 @@ func WlrRandrExecCommand(args ...string) ([]byte, error) {
 	return data, err
 }
 
-func monOptions(mon monitors.Monitor, state string) ([]string, error) {
-	err := mon.CheckStateField()
-	if err != nil {
-		return nil, err
-	}
-	err = mon.CheckStringFields()
-	if err != nil {
-		return nil, err
-	}
-
+func monOptions(mon monitors.Monitor, state string) ([]string) {
 	wlrRandrStrs := []string{ "--output", *mon.Name }
 	if *mon.State == state {
 		wlrRandrStrs = append(wlrRandrStrs, "--on")
@@ -37,7 +28,7 @@ func monOptions(mon monitors.Monitor, state string) ([]string, error) {
 	} else {
 		wlrRandrStrs = append(wlrRandrStrs, "--off")
 	}
-	return wlrRandrStrs, nil
+	return wlrRandrStrs
 }
 
 func WlrRandrJson() (output []byte, err error) {
