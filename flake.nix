@@ -31,7 +31,7 @@
         }:
         {
           devenv.shells.default = {
-            packages = with pkgs; [ just gopls ];
+            packages = with pkgs; [ just gopls wlr-randr hyprland ];
             languages.nix.enable = true;
             languages.go.enable = true;
           };
