@@ -10,18 +10,18 @@ import (
 )
 
 func hyprMonString(mon monitors.Monitor, state string) (string, bool) {
-	if *mon.State == state {
+	if mon.State == state {
 		var name, resolution, position, scale string
 
-		name = *mon.Name
-		resolution = fmt.Sprintf("%dx%d@%d", *mon.Width, *mon.Height, *mon.RefreshRate)
-		position = fmt.Sprintf("%dx%d", *mon.X, *mon.Y)
-		scale = fmt.Sprintf("%d", *mon.Scale)
+		name = mon.Name
+		resolution = fmt.Sprintf("%dx%d@%d", mon.Width, mon.Height, mon.RefreshRate)
+		position = fmt.Sprintf("%dx%d", mon.X, mon.Y)
+		scale = fmt.Sprintf("%d", mon.Scale)
 
 		hyprstring := fmt.Sprintf("%s,%s,%s,%s", name, resolution, position, scale)
 		return hyprstring, true
 	} else {
-		return fmt.Sprintf("%s,disable", *mon.Name), false
+		return fmt.Sprintf("%s,disable", mon.Name), false
 	}
 
 }

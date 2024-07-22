@@ -2,20 +2,19 @@ package monitors
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"slices"
 )
 
 type Monitor struct {
-	Name        *string `json:"name"`
-	Width       *int64  `json:"width"`
-	Height      *int64  `json:"height"`
-	RefreshRate *int    `json:"refreshRate"`
-	X           *int64  `json:"x"`
-	Y           *int64  `json:"y"`
-	Scale       *int    `json:"scale"`
-	State       *string `json:"state"`
+	Name        string `json:"name"`
+	Width       int64  `json:"width"`
+	Height      int64  `json:"height"`
+	RefreshRate int    `json:"refreshRate"`
+	X           int64  `json:"x"`
+	Y           int64  `json:"y"`
+	Scale       int    `json:"scale"`
+	State       string `json:"state"`
 }
 
 type MonitorList []Monitor
@@ -43,10 +42,7 @@ func ReadMonitorConfigFile(file string) ([]byte, error) {
 func CompareMonitorLists(monl MonitorList, names []string) (bool, error) {
 	cont := true
 	for _, val := range monl {
-		if val.Name == nil {
-			return false, fmt.Errorf("monitor has Name nil")
-		}
-		if !slices.Contains(names, *val.Name) {
+		if !slices.Contains(names, val.Name) {
 			cont = false
 		}
 	}
