@@ -79,7 +79,7 @@ func main() {
 			for _, str := range stateStrings {
 				fmt.Println(str)
 				// TODO: make this work with just IPC
-				if output, err := ipc.RunHyprctl("keyword", "monitor", str); err != nil {
+				if output, err := ipc.HyprctlExecCommand("keyword", "monitor", str); err != nil {
 					DieErr("something went wrong executing hyprctl", err, CommandExecutionError)
 				} else {
 					fmt.Print(string(output))

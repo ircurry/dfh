@@ -139,7 +139,7 @@ func getEventSocket() net.Conn {
 	return sock2
 }
 
-func RunHyprctl(args ...string) (output []byte, err error) {
+func HyprctlExecCommand(args ...string) (output []byte, err error) {
 	cmd := exec.Command("hyprctl", args...)
 	output, err = cmd.Output()
 	return
