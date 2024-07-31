@@ -102,3 +102,40 @@ func TestUnmarshalMissingKey(t *testing.T) {
 		}
 	}
 }
+
+func TestUnmarshalWithExtraFields(t *testing.T) {
+	var objects [][]byte = [][]byte{
+		[]byte(`{"name": "eDP-1","width": 2256,"height": 1504,"refreshRate": 60,"x": 0,"y": 0,"scale": 2,"state": "dock"}`),
+		[]byte(`{"extra": "something","name": "eDP-1","width": 2256,"height": 1504,"refreshRate": 60,"x": 0,"y": 0,"scale": 2,"state": "dock"}`),
+		[]byte(`{"name": "eDP-1","extra": "something","width": 2256,"height": 1504,"refreshRate": 60,"x": 0,"y": 0,"scale": 2,"state": "dock"}`),
+		[]byte(`{"name": "eDP-1","width": 2256,"extra": "something","height": 1504,"refreshRate": 60,"x": 0,"y": 0,"scale": 2,"state": "dock"}`),
+		[]byte(`{"name": "eDP-1","width": 2256,"height": 1504,"extra": "something","refreshRate": 60,"x": 0,"y": 0,"scale": 2,"state": "dock"}`),
+		[]byte(`{"name": "eDP-1","width": 2256,"height": 1504,"refreshRate": 60,"extra": "something","x": 0,"y": 0,"scale": 2,"state": "dock"}`),
+		[]byte(`{"name": "eDP-1","width": 2256,"height": 1504,"refreshRate": 60,"x": 0,"extra": "something","y": 0,"scale": 2,"state": "dock"}`),
+		[]byte(`{"name": "eDP-1","width": 2256,"height": 1504,"refreshRate": 60,"x": 0,"y": 0,"extra": "something","scale": 2,"state": "dock"}`),
+		[]byte(`{"name": "eDP-1","width": 2256,"height": 1504,"refreshRate": 60,"x": 0,"y": 0,"scale": 2,"extra": "something","state": "dock"}`),
+		[]byte(`{"name": "eDP-1","width": 2256,"height": 1504,"refreshRate": 60,"x": 0,"y": 0,"scale": 2,"state": "dock","extra": "something"}`),
+	}
+	base := Monitor{
+		Name: "eDP-1",
+		Width: 2256,
+		Height: 1504,
+		RefreshRate: 60,
+		X: 0,
+		Y: 0,
+		Scale: 2,
+		State: "dock",
+	}
+	for _, object := range objects {
+		t.Log(string(object))
+		mon := new(Monitor)
+		err := json.Unmarshal(object, mon)
+		if err != nil {
+			t.Error(err.Error())
+		}
+		if !(base == *mon) {
+			t.Errorf("Struct read and struct tested against do not equal\n[[Read]]\n%s\n\n[[Base]]\n%s\n[[Read Json]]\n%s",
+				mon.String(), base.String(), string(object))
+		}
+	}
+}
