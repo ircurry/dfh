@@ -46,7 +46,7 @@ func TestUnmarshalProperFormat(t *testing.T) {
 			t.Error(err.Error())
 		}
 		if !(base == *mon) {
-			t.Errorf("Struct read and struct tested against do not equal\nRead:\n%s\n\nBase:\n%s\nRead Json: %s",
+			t.Errorf("Struct read and struct tested against do not equal\n[[Read]]\n%s\n\n[[Base]]\n%s\n[[Read Json]]\n%s",
 				mon.String(), base.String(), string(object))
 		}
 	}
