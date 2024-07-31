@@ -171,7 +171,8 @@ func (mon *Monitor) UnmarshalJSON(data []byte) error {
 			mon.State = val
 			keysSet[key] = true
 		default:
-			return fmt.Errorf("Unknown key %s given", key)
+			dec.Token()
+			continue
 		}
 
 	}
