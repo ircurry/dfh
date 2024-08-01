@@ -53,7 +53,6 @@ func TestUnmarshalProperFormat(t *testing.T) {
 	}
 }
 
-//2:15:04
 func TestUnmarshalMissingKey(t *testing.T) {
 	type missingKey struct {
 		key string
@@ -213,6 +212,232 @@ func TestUnmarshalWithNonOpenBracketDelim(t *testing.T) {
 
 		if err.Error() != obj.errWant.Error() {
 			t.Errorf("Expected error \"%s\" but got \"%s\"", obj.errWant.Error(), err.Error())
+		}
+	}
+}
+
+func TestUnmarshalWithWrongFieldTypes(t *testing.T) {
+	type object struct {
+		data []byte
+		key string
+		expectType string
+		actualType string
+	}
+	fmtInvalidTypeErr := func(str string, valType string, v any) error {
+		return fmt.Errorf("key %s expect type %s, found %s", str, valType, v)
+	}
+
+	var objects []object = []object{
+		//name
+		{
+			[]byte(`{"name": 42}`),
+			"name",
+			"string",
+			"float64",
+		},
+		{
+			[]byte(`{"name": null}`),
+			"name",
+			"string",
+			"<nil>",
+		},
+		{
+			[]byte(`{"name": true}`),
+			"name",
+			"string",
+			"bool",
+		},
+		{
+			[]byte(`{"name": {}}`),
+			"name",
+			"string",
+			"json.Delim",
+		},
+		//width
+		{
+			[]byte(`{"width": "asdf"}`),
+			"width",
+			"int64",
+			"string",
+		},
+		{
+			[]byte(`{"width": null}`),
+			"width",
+			"int64",
+			"<nil>",
+		},
+		{
+			[]byte(`{"width": true}`),
+			"width",
+			"int64",
+			"bool",
+		},
+		{
+			[]byte(`{"width": {}}`),
+			"width",
+			"int64",
+			"json.Delim",
+		},
+		//height
+		{
+			[]byte(`{"height": "asdf"}`),
+			"height",
+			"int64",
+			"string",
+		},
+		{
+			[]byte(`{"height": null}`),
+			"height",
+			"int64",
+			"<nil>",
+		},
+		{
+			[]byte(`{"height": true}`),
+			"height",
+			"int64",
+			"bool",
+		},
+		{
+			[]byte(`{"height": {}}`),
+			"height",
+			"int64",
+			"json.Delim",
+		},
+		//refreshRate
+		{
+			[]byte(`{"refreshRate": "asdf"}`),
+			"refreshRate",
+			"int",
+			"string",
+		},
+		{
+			[]byte(`{"refreshRate": null}`),
+			"refreshRate",
+			"int",
+			"<nil>",
+		},
+		{
+			[]byte(`{"refreshRate": true}`),
+			"refreshRate",
+			"int",
+			"bool",
+		},
+		{
+			[]byte(`{"refreshRate": {}}`),
+			"refreshRate",
+			"int",
+			"json.Delim",
+		},
+		//x
+		{
+			[]byte(`{"x": "asdf"}`),
+			"x",
+			"int64",
+			"string",
+		},
+		{
+			[]byte(`{"x": null}`),
+			"x",
+			"int64",
+			"<nil>",
+		},
+		{
+			[]byte(`{"x": true}`),
+			"x",
+			"int64",
+			"bool",
+		},
+		{
+			[]byte(`{"x": {}}`),
+			"x",
+			"int64",
+			"json.Delim",
+		},
+		//y
+		{
+			[]byte(`{"y": "asdf"}`),
+			"y",
+			"int64",
+			"string",
+		},
+		{
+			[]byte(`{"y": null}`),
+			"y",
+			"int64",
+			"<nil>",
+		},
+		{
+			[]byte(`{"y": true}`),
+			"y",
+			"int64",
+			"bool",
+		},
+		{
+			[]byte(`{"y": {}}`),
+			"y",
+			"int64",
+			"json.Delim",
+		},
+		//scale
+		{
+			[]byte(`{"scale": "asdf"}`),
+			"scale",
+			"int",
+			"string",
+		},
+		{
+			[]byte(`{"scale": null}`),
+			"scale",
+			"int",
+			"<nil>",
+		},
+		{
+			[]byte(`{"scale": true}`),
+			"scale",
+			"int",
+			"bool",
+		},
+		{
+			[]byte(`{"scale": {}}`),
+			"scale",
+			"int",
+			"json.Delim",
+		},
+		//state
+		{
+			[]byte(`{"state": 42}`),
+			"state",
+			"string",
+			"float64",
+		},
+		{
+			[]byte(`{"state": null}`),
+			"state",
+			"string",
+			"<nil>",
+		},
+		{
+			[]byte(`{"state": true}`),
+			"state",
+			"string",
+			"bool",
+		},
+		{
+			[]byte(`{"state": {}}`),
+			"state",
+			"string",
+			"json.Delim",
+		},
+	}
+	for _, obj := range objects {
+		t.Log(string(obj.data))
+		errWant := fmtInvalidTypeErr(obj.key, obj.expectType, obj.actualType)
+		t.Log(errWant.Error())
+		var mon Monitor
+		err := mon.UnmarshalJSON(obj.data)
+
+		if err.Error() != errWant.Error() {
+			t.Errorf("Expected error \"%s\" but got \"%s\"", errWant.Error(), err.Error())
 		}
 	}
 }
