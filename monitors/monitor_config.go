@@ -87,7 +87,7 @@ func (mon *Monitor) UnmarshalJSON(data []byte) error {
 			}
 			val, ok := tkn.(string)
 			if !ok {
-				return fmtInvalidTypeErr(key, "string", val)
+				return fmtInvalidTypeErr(key, "string", tkn)
 			}
 			mon.Name = val
 			keysSet[key] = true
@@ -98,7 +98,7 @@ func (mon *Monitor) UnmarshalJSON(data []byte) error {
 			}
 			val, ok := tkn.(float64)
 			if !ok {
-				return fmtInvalidTypeErr(key, "int64", val)
+				return fmtInvalidTypeErr(key, "int64", tkn)
 			}
 			mon.Width = int64(val)
 			keysSet[key] = true
@@ -109,7 +109,7 @@ func (mon *Monitor) UnmarshalJSON(data []byte) error {
 			}
 			val, ok := tkn.(float64)
 			if !ok {
-				return fmtInvalidTypeErr(key, "int64", val)
+				return fmtInvalidTypeErr(key, "int64", tkn)
 			}
 			mon.Height = int64(val)
 			keysSet[key] = true
@@ -120,7 +120,7 @@ func (mon *Monitor) UnmarshalJSON(data []byte) error {
 			}
 			val, ok := tkn.(float64)
 			if !ok {
-				return fmtInvalidTypeErr(key, "int", val)
+				return fmtInvalidTypeErr(key, "int", tkn)
 			}
 			mon.RefreshRate = int(val)
 			keysSet[key] = true
@@ -131,7 +131,7 @@ func (mon *Monitor) UnmarshalJSON(data []byte) error {
 			}
 			val, ok := tkn.(float64)
 			if !ok {
-				return fmtInvalidTypeErr(key, "int64", val)
+				return fmtInvalidTypeErr(key, "int64", tkn)
 			}
 			mon.X = int64(val)
 			keysSet[key] = true
@@ -142,7 +142,7 @@ func (mon *Monitor) UnmarshalJSON(data []byte) error {
 			}
 			val, ok := tkn.(float64)
 			if !ok {
-				return fmtInvalidTypeErr(key, "int64", val)
+				return fmtInvalidTypeErr(key, "int64", tkn)
 			}
 			mon.Y = int64(val)
 			keysSet[key] = true
@@ -153,7 +153,7 @@ func (mon *Monitor) UnmarshalJSON(data []byte) error {
 			}
 			val, ok := tkn.(float64)
 			if !ok {
-				return fmtInvalidTypeErr(key, "int", val)
+				return fmtInvalidTypeErr(key, "int", tkn)
 			}
 			mon.Scale = int(val)
 			keysSet[key] = true
@@ -164,7 +164,7 @@ func (mon *Monitor) UnmarshalJSON(data []byte) error {
 			}
 			val, ok := tkn.(string)
 			if !ok {
-				return fmtInvalidTypeErr(key, "string", val)
+				return fmtInvalidTypeErr(key, "string", tkn)
 			}
 			mon.State = val
 			keysSet[key] = true
