@@ -87,7 +87,7 @@ func main() {
 			}
 			return
 		case "spwn":
-			ipc.HyprMessage("dispatch exec "+os.Args[2])
+			ipc.HyprMessage("dispatch exec " + os.Args[2])
 			return
 		case "lsn":
 			ipc.HyprPrintEvents(*lsnNum)
