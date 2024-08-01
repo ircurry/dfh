@@ -193,3 +193,26 @@ func TestUnmarshalWithInitialDelim(t *testing.T) {
 		}
 	}
 }
+
+func TestUnmarshalWithNonOpenBracketDelim(t *testing.T) {
+	type object struct {
+		data []byte
+		errWant error
+	}
+	var objects []object = []object{
+		{
+			[]byte(`[]`),
+			fmt.Errorf("JSON token is not an begin-object, instead was ["),
+		},
+	}
+	for _, obj := range objects {
+		t.Log(string(obj.data))
+		t.Log(string(obj.errWant.Error()))
+		var mon Monitor
+		err := mon.UnmarshalJSON(obj.data)
+
+		if err.Error() != obj.errWant.Error() {
+			t.Errorf("Expected error \"%s\" but got \"%s\"", obj.errWant.Error(), err.Error())
+		}
+	}
+}
