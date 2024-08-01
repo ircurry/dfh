@@ -2,6 +2,7 @@ package monitors
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"testing"
 )
@@ -137,5 +138,30 @@ func TestUnmarshalWithExtraFields(t *testing.T) {
 			t.Errorf("Struct read and struct tested against do not equal\n[[Read]]\n%s\n\n[[Base]]\n%s\n[[Read Json]]\n%s",
 				mon.String(), base.String(), string(object))
 		}
+	}
+}
+
+func TestUnmarshalWithEmpty(t *testing.T) {
+	var mon Monitor
+	dat := []byte("")
+	err := mon.UnmarshalJSON(dat)
+	errWant := errors.New("Reached EOF before any json tokens could be read")
+	if err == nil {
+		t.Error("Expected function to error but did not")
+	}
+	if err.Error() != errWant.Error() {
+		t.Errorf("Expected error \"%s\" but got \"%s\"", errWant.Error(), err.Error())
+	}
+}
+
+func TestUnmarshalWithInitialDelim(t *testing.T) {
+	var object []byte = []byte(`"asdf"`)
+	t.Log(string(object))
+	var mon Monitor
+	err := mon.UnmarshalJSON(object)
+	errWant := errors.New("first token was not a delimeter, instead was string")
+
+	if err.Error() != errWant.Error() {
+		t.Errorf("Expected error \"%s\" but got \"%s\"", errWant.Error(), err.Error())
 	}
 }

@@ -41,7 +41,7 @@ func (mon *Monitor) UnmarshalJSON(data []byte) error {
 
 	delim, ok := tkn.(json.Delim)
 	if !ok {
-		return fmt.Errorf("first token was not a delimeter, instead was %T", delim)
+		return fmt.Errorf("first token was not a delimeter, instead was %T", tkn)
 	} else if delim.String() != "{" {
 		return fmt.Errorf("JSON token is not an begin-object, instead was %s", delim.String())
 	}
