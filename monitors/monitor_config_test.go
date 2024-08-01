@@ -155,13 +155,41 @@ func TestUnmarshalWithEmpty(t *testing.T) {
 }
 
 func TestUnmarshalWithInitialDelim(t *testing.T) {
-	var object []byte = []byte(`"asdf"`)
-	t.Log(string(object))
-	var mon Monitor
-	err := mon.UnmarshalJSON(object)
-	errWant := errors.New("first token was not a delimeter, instead was string")
-
-	if err.Error() != errWant.Error() {
-		t.Errorf("Expected error \"%s\" but got \"%s\"", errWant.Error(), err.Error())
+	type object struct {
+		data []byte
+		dataType string
+	}
+	var objects []object = []object{
+		{
+			[]byte(`"asdf"`),
+			"string",
+		},
+		{
+			[]byte(`1`),
+			"float64",
+		},
+		{
+			[]byte(`4.25`),
+			"float64",
+		},
+		{
+			[]byte(`true`),
+			"bool",
+		},
+		{
+			[]byte(`null`),
+			"<nil>",
+		},
+	}
+	for _, obj := range objects {
+		t.Log(string(obj.data))
+		t.Log(string(obj.dataType))
+		var mon Monitor
+		err := mon.UnmarshalJSON(obj.data)
+		errWant := fmt.Errorf("first token was not a delimeter, instead was %s", obj.dataType)
+		
+		if err.Error() != errWant.Error() {
+			t.Errorf("Expected error \"%s\" but got \"%s\"", errWant.Error(), err.Error())
+		}
 	}
 }
