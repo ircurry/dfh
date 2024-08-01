@@ -60,35 +60,35 @@ func TestUnmarshalMissingKey(t *testing.T) {
 		json []byte
 	}
 	var objects []missingKey = []missingKey{
-		missingKey{
+		{
 			"name",
 			[]byte(`{"width": 2256,"height": 1504,"refreshRate": 60,"x": 0,"y": 0,"scale": 2,"state": "dock"}`),
 		},
-		missingKey{
+		{
 			"width",
 			[]byte(`{"name": "eDP-1","height": 1504,"refreshRate": 60,"x": 0,"y": 0,"scale": 2,"state": "dock"}`),
 		},
-		missingKey{
+		{
 			"height",
 			[]byte(`{"name": "eDP-1","width": 2256,"refreshRate": 60,"x": 0,"y": 0,"scale": 2,"state": "dock"}`),
 		},
-		missingKey{
+		{
 			"refreshRate",
 			[]byte(`{"name": "eDP-1","width": 2256,"height": 1504,"x": 0,"y": 0,"scale": 2,"state": "dock"}`),
 		},
-		missingKey{
+		{
 			"x",
 			[]byte(`{"name": "eDP-1","width": 2256,"height": 1504,"refreshRate": 60,"y": 0,"scale": 2,"state": "dock"}`),
 		},
-		missingKey{
+		{
 			"y",
 			[]byte(`{"name": "eDP-1","width": 2256,"height": 1504,"refreshRate": 60,"x": 0,"scale": 2,"state": "dock"}`),
 		},
-		missingKey{
+		{
 			"scale",
 			[]byte(`{"name": "eDP-1","width": 2256,"height": 1504,"refreshRate": 60,"x": 0,"y": 0,"state": "dock"}`),
 		},
-		missingKey{
+		{
 			"state",
 			[]byte(`{"name": "eDP-1","width": 2256,"height": 1504,"refreshRate": 60,"x": 0,"y": 0,"scale": 2}`),
 		},
