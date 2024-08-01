@@ -73,8 +73,6 @@ func (mon *Monitor) UnmarshalJSON(data []byte) error {
 			} else {
 				return fmt.Errorf("Expected JSON key to close ")
 			}
-		default:
-			return fmt.Errorf("Expected JSON key name to be a string, instead got %T", tkn)
 		}
 
 		if !dec.More() {
