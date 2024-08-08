@@ -4,21 +4,18 @@ cmds := ```
     dirs="$(find ./cmd/ -mindepth 1 -maxdepth 1 -type d)"
     for dir in "$dirs"; do basename "$dir"; done
 	```
+gofiles := ```
+    find -regextype emacs -regex './[a-z]+.*\.go'
+	```
 
 # run 'just gbuild dfh'
 [group('build')]
 default: (gobuild)
 
-# format 'cmd' files using go fmt
-[group('format')]
-goformatcmd cmd: 
-	go fmt {{ gomodule }}/cmd/{{ cmd }}
-alias gfcmd := goformatcmd
-
 # format all go command files using go fmt
 [group('format')]
-goformat: 
-	for x in {{ cmds }}; do go fmt {{ gomodule }}/cmd/$x; done
+goformat:
+	printf "{{ gofiles }}" | xargs -I{} go fmt {}
 alias gf := goformat
 
 # test 'cmd' files using go test

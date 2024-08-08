@@ -18,7 +18,7 @@ func TestUnmarshalProperFormat(t *testing.T) {
 		[]byte(`{"scale": 2,"state": "dock","name": "eDP-1","width": 2256,"height": 1504,"refreshRate": 60,"x": 0,"y": 0}`),
 		[]byte(`{"state": "dock","name": "eDP-1","width": 2256,"height": 1504,"refreshRate": 60,"x": 0,"y": 0,"scale": 2}`),
 		[]byte(
-`{
+			`{
     "name": "eDP-1",
     "width": 2256,
     "height": 1504,
@@ -30,14 +30,14 @@ func TestUnmarshalProperFormat(t *testing.T) {
 }`),
 	}
 	base := Monitor{
-		Name: "eDP-1",
-		Width: 2256,
-		Height: 1504,
+		Name:        "eDP-1",
+		Width:       2256,
+		Height:      1504,
 		RefreshRate: 60,
-		X: 0,
-		Y: 0,
-		Scale: 2,
-		State: "dock",
+		X:           0,
+		Y:           0,
+		Scale:       2,
+		State:       "dock",
 	}
 	for _, object := range objects {
 		t.Log(string(object))
@@ -55,7 +55,7 @@ func TestUnmarshalProperFormat(t *testing.T) {
 
 func TestUnmarshalMissingKey(t *testing.T) {
 	type missingKey struct {
-		key string
+		key  string
 		json []byte
 	}
 	var objects []missingKey = []missingKey{
@@ -117,14 +117,14 @@ func TestUnmarshalWithExtraFields(t *testing.T) {
 		[]byte(`{"name": "eDP-1","width": 2256,"height": 1504,"refreshRate": 60,"x": 0,"y": 0,"scale": 2,"state": "dock","extra": "something"}`),
 	}
 	base := Monitor{
-		Name: "eDP-1",
-		Width: 2256,
-		Height: 1504,
+		Name:        "eDP-1",
+		Width:       2256,
+		Height:      1504,
 		RefreshRate: 60,
-		X: 0,
-		Y: 0,
-		Scale: 2,
-		State: "dock",
+		X:           0,
+		Y:           0,
+		Scale:       2,
+		State:       "dock",
 	}
 	for _, object := range objects {
 		t.Log(string(object))
@@ -155,7 +155,7 @@ func TestUnmarshalWithEmpty(t *testing.T) {
 
 func TestUnmarshalWithInitialDelim(t *testing.T) {
 	type object struct {
-		data []byte
+		data     []byte
 		dataType string
 	}
 	var objects []object = []object{
@@ -186,7 +186,7 @@ func TestUnmarshalWithInitialDelim(t *testing.T) {
 		var mon Monitor
 		err := mon.UnmarshalJSON(obj.data)
 		errWant := fmt.Errorf("first token was not a delimeter, instead was %s", obj.dataType)
-		
+
 		if err.Error() != errWant.Error() {
 			t.Errorf("Expected error \"%s\" but got \"%s\"", errWant.Error(), err.Error())
 		}
@@ -195,7 +195,7 @@ func TestUnmarshalWithInitialDelim(t *testing.T) {
 
 func TestUnmarshalWithNonOpenBracketDelim(t *testing.T) {
 	type object struct {
-		data []byte
+		data    []byte
 		errWant error
 	}
 	var objects []object = []object{
@@ -218,8 +218,8 @@ func TestUnmarshalWithNonOpenBracketDelim(t *testing.T) {
 
 func TestUnmarshalWithWrongFieldTypes(t *testing.T) {
 	type object struct {
-		data []byte
-		key string
+		data       []byte
+		key        string
 		expectType string
 		actualType string
 	}

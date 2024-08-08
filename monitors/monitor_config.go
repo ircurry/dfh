@@ -47,14 +47,14 @@ func (mon *Monitor) UnmarshalJSON(data []byte) error {
 	}
 
 	keysSet := map[string]bool{
-		"name": false,
-		"width": false,
-		"height": false,
+		"name":        false,
+		"width":       false,
+		"height":      false,
 		"refreshRate": false,
-		"x": false,
-		"y": false,
-		"scale": false,
-		"state": false,
+		"x":           false,
+		"y":           false,
+		"scale":       false,
+		"state":       false,
 	}
 
 	for dec.More() {

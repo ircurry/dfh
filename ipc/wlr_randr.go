@@ -15,8 +15,8 @@ func WlrRandrExecCommand(args ...string) ([]byte, error) {
 	return data, err
 }
 
-func monOptions(mon monitors.Monitor, state string) ([]string) {
-	wlrRandrStrs := []string{ "--output", mon.Name }
+func monOptions(mon monitors.Monitor, state string) []string {
+	wlrRandrStrs := []string{"--output", mon.Name}
 	if mon.State == state {
 		wlrRandrStrs = append(wlrRandrStrs, "--on")
 		wlrRandrStrs = append(wlrRandrStrs, "--mode")
