@@ -445,27 +445,9 @@ func TestUnmarshalWithWrongFieldTypes(t *testing.T) {
 func TestUnmarshallMonitorList(t *testing.T) {
 	data := []byte(`[{"name": "eDP-1","width": 2256,"height": 1504,"refreshRate": 60,"x": 0,"y": 0,"scale": 2,"state": "undock"},{"name": "DP-2","width": 1920,"height": 1080,"refreshRate": 60,"x": 0,"y": 0,"scale": 1,"state": "dock"}]`)
 	expectedValue := []Monitor{
-		{
-			"eDP-1",
-			2256,
-			1504,
-			60,
-			0,
-			0,
-			2,
-			"undock",
-		},
-		{
-			"DP-2",
-			1920,
-			1080,
-			60,
-			0,
-			0,
-			1,
-			"dock",
-		},
-	}[:]
+		{"eDP-1", 2256, 1504, 60, 0, 0, 2, "undock"},
+		{"DP-2", 1920, 1080, 60, 0, 0, 1, "dock"},
+	}
 	var monl MonitorList
 	err := monl.FromJson(data)
 	if err != nil {
