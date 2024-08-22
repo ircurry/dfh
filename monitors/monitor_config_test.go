@@ -477,3 +477,19 @@ func TestUnmarshallMonitorList(t *testing.T) {
 		}
 	}
 }
+
+func TestCompareMonitorValues(t *testing.T) {
+	monl := MonitorList{
+		{"eDP-1", 2256, 1504, 60, 0, 0, 2, "undock"},
+		{"DP-2", 1920, 1080, 60, 0, 0, 1, "dock"},
+	}
+	names := []string{"eDP-1", "DP-2"}
+
+	b, err := CompareMonitorLists(monl, names)
+	if err != nil {
+		t.Error(err.Error())
+	}
+	if !b {
+		t.Error("Expected all monitors to be present but found that some were missing")
+	}
+}
