@@ -455,7 +455,7 @@ func TestUnmarshallMonitorList(t *testing.T) {
 	}
 	for i := range monl {
 		if monl[i] != expectedValue[i] {
-			t.Errorf("Expected value: %v\nGot value: %v\n", expectedValue, monl)
+			t.Errorf("\nExpected value: %v\nGot value: %v\n", expectedValue, monl)
 		}
 	}
 }
