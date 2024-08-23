@@ -6,7 +6,7 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/ircurry/dfh/monitors"
+	"github.com/ircurry/dfh/internal/monitors"
 )
 
 func hyprMonString(mon monitors.Monitor, state string) (string, bool) {

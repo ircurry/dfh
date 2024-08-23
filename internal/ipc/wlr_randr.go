@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/ircurry/dfh/monitors"
+	"github.com/ircurry/dfh/internal/monitors"
 )
 
 func WlrRandrExecCommand(args ...string) ([]byte, error) {

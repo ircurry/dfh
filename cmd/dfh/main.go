@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ircurry/dfh/ipc"
-	"github.com/ircurry/dfh/monitors"
+	"github.com/ircurry/dfh/internal/ipc"
+	"github.com/ircurry/dfh/internal/monitors"
 )
 
 const (

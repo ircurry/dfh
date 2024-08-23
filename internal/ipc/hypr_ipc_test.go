@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ircurry/dfh/monitors"
+	"github.com/ircurry/dfh/internal/monitors"
 )
 
 func TestHyprMonString(t *testing.T) {
