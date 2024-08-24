@@ -23,6 +23,13 @@
           wlr-randr
         ]
       }"
+    wrapProgram $out/bin/hyprdock \
+      --prefix PATH : "${
+        lib.makeBinPath [
+          hyprland
+          wlr-randr
+        ]
+      }"
   '';
 
   vendorHash = null;
