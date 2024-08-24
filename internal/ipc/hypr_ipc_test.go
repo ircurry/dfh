@@ -124,7 +124,7 @@ func TestStateStrings(t *testing.T) {
 	}
 	for _, obj := range objects {
 		t.Run(obj.name, func(t *testing.T) {
-			strList, err := StateStrings(obj.monl, obj.testState)
+			strList, err := StateStrings(obj.monl, obj.testState, false)
 			if obj.expectedErr != nil {
 				if err != nil {
 					if err.Error() != obj.expectedErr.Error() {

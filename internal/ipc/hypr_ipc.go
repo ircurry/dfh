@@ -26,13 +26,15 @@ func hyprMonString(mon monitors.Monitor, state string) (string, bool) {
 
 }
 
-func StateStrings(monlist monitors.MonitorList, state string) ([]string, error) {
+func StateStrings(monlist monitors.MonitorList, state string, excludeDisable bool) ([]string, error) {
 	strlist := make([]string, 0)
 	var stateErr error = nil
 	containsState := false
 	for _, mon := range monlist {
 		str, isState := hyprMonString(mon, state)
-		strlist = append(strlist, str)
+		if isState || !excludeDisable {
+			strlist = append(strlist, str)
+		}
 		if isState {
 			containsState = true
 		}

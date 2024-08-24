@@ -14,6 +14,7 @@ func main() {
 	monsCmd := flag.NewFlagSet("monitors", flag.ExitOnError)
 	monsFile := monsCmd.String("f", "", "the json file to read monitor definitions from")
 	monsAllowUnconnected := monsCmd.Bool("a", false, "allow unconnected monitors to be configured")
+	monsExcludeDisable := monsCmd.Bool("exclude-disable", false, "do not disable other monitors")
 
 
 	if len(os.Args) <= 1 {
@@ -32,7 +33,7 @@ func main() {
 	err = monl.FromJson(contents)
 	cli.DieIfErr("Something went wrong parsing config file",
 		err, cli.MonitorConfigParseFailure)
-	stateStrings, err := ipc.StateStrings(monl, state)
+	stateStrings, err := ipc.StateStrings(monl, state, *monsExcludeDisable)
 	cli.DieIfErr("Error creating hyprland monitor settings", err, cli.MonitorStateFailure)
 
 	wlrdata, err := ipc.WlrRandrJson()
