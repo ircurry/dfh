@@ -19,7 +19,7 @@ func main() {
 	if len(os.Args) <= 1 {
 		cli.Die("Not enough arguments", cli.ArgumentError)
 	}
-	monsCmd.Parse(os.Args[2:])
+	monsCmd.Parse(os.Args[1:])
 	state := monsCmd.Arg(0)
 	if state == "" {
 		cli.Die("No state given", cli.MonitorStateFailure)
