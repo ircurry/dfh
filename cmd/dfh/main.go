@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ircurry/dfh/internal/cli"
 	"github.com/ircurry/dfh/internal/ipc"
 )
 
@@ -21,16 +20,6 @@ func main() {
 			return
 		case "lsn":
 			ipc.HyprPrintEvents(*lsnNum)
-			return
-		case "test":
-			data, err := ipc.WlrRandrJson()
-			cli.DieIfErr("Something Went Wrong", err, 25)
-			names, err := ipc.WlrRandrGetMonitors(data)
-			cli.DieIfErr("Something Went Wrong", err, 26)
-			for _, name := range names {
-				fmt.Println(name)
-			}
-
 			return
 		}
 	}
