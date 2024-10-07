@@ -34,6 +34,7 @@
             packages = with pkgs; [ just gopls wlr-randr hyprland ];
             languages.nix.enable = true;
             languages.go.enable = true;
+            languages.go.enableHardeningWorkaround = true;
           };
           packages = rec {
             dfh = pkgs.callPackage ./package.nix { version = "0.1"; };
