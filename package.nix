@@ -3,8 +3,7 @@
   lib,
   makeWrapper,
   buildGoModule,
-  hyprland,
-  wlr-randr
+  hyprland
 }: buildGoModule {
   pname = "dfh";
   inherit version;
@@ -20,14 +19,12 @@
       --prefix PATH : "${
         lib.makeBinPath [
           hyprland
-          wlr-randr
         ]
       }"
     wrapProgram $out/bin/hyprdock \
       --prefix PATH : "${
         lib.makeBinPath [
           hyprland
-          wlr-randr
         ]
       }"
   '';
