@@ -9,15 +9,6 @@ import (
 	"github.com/ircurry/dfh/internal/ipc"
 )
 
-type earlyExit struct {
-	eeType    string
-	eeMessage string
-}
-
-func (e earlyExit) Error() string {
-	return e.eeMessage
-}
-
 type cliParseError struct {
 	eMessage string
 }
@@ -30,8 +21,17 @@ func newCliParseError(msg string) cliParseError {
 	return cliParseError{msg}
 }
 
+const helpText = `monchk - check if monitors are connected
+Usage:
+  [options...] [monitors...]
+
+Options:
+  -h, --help        display help information
+`
+
 type cliArgs struct {
 	monitors []string
+	help bool
 }
 
 func newCliArgs() cliArgs {
@@ -41,31 +41,17 @@ func newCliArgs() cliArgs {
 }
 
 func (c *cliArgs) parseArgs(args []string) error {
-	extraArgs := make([]string, 0)
 	for i := 0; i < len(args); i++ {
 		switch args[i] {
 		case "-h":
 			fallthrough
 		case "--help":
-			return earlyExit{
-				eeType:    "help",
-				eeMessage: "monchk [-h | --help] [-m <monitor>]\n",
-			}
-		case "-m":
-			c.monitors = append(c.monitors ,args[i+1])
-			i++
+			c.help = true
 		default:
-			extraArgs = append(extraArgs, args[i])
+			c.monitors = append(c.monitors, args[i])
 		}
 	}
 
-	if len(extraArgs) != 0 {
-		extraArgsString := ""
-		for _, v := range extraArgs {
-			extraArgsString += fmt.Sprintf("  Unknown Argument: '%s'\n", v)
-		}
-		return newCliParseError(fmt.Sprintf("An issue occured while parsing arguments:\n" + extraArgsString))
-	}
 	return nil
 }
 
@@ -73,12 +59,11 @@ func main() {
 	progArgs := newCliArgs()
 	err := progArgs.parseArgs(os.Args[1:])
 	if err != nil {
-		switch err.(type) {
-		case earlyExit:
-			fmt.Print(err.Error())
-		default:
-			cli.Die(err.Error(), cli.ArgumentError)
-		}
+		cli.Die(err.Error(), cli.ArgumentError)
+	}
+	if progArgs.help {
+		fmt.Print(helpText)
+		os.Exit(0)
 	}
 	output, err := ipc.HyprctlExecCommand("monitors", "-j")
 	if err != nil {
