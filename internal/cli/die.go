@@ -7,6 +7,7 @@ import (
 
 const (
 	_ = iota
+	CommandParseFailure
 	ReadFileFailure
 	MonitorConfigParseFailure
 	MonitorStateFailure

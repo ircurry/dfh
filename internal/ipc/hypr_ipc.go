@@ -7,6 +7,7 @@ import (
 	"os/exec"
 
 	"github.com/ircurry/dfh/internal/monitors"
+	"github.com/ircurry/dfh/internal/monitors/profile"
 )
 
 func hyprMonString(mon monitors.Monitor, state string) (string, bool) {
@@ -136,4 +137,38 @@ func HyprctlExecCommand(args ...string) (output []byte, err error) {
 	cmd := exec.Command("hyprctl", args...)
 	output, err = cmd.Output()
 	return
+}
+
+func MonitorProfileToHyprlandString(prfl profile.Profile) []string {
+	hyprStrs := make([]string, 0)
+	for _, monitor := range prfl.Monitors {
+		name := ""
+		if monitor.Name != nil {
+			name = *monitor.Name
+		}
+		if !monitor.Enabled {
+			hyprStrs = append(hyprStrs, fmt.Sprintf("%s,disabled", name))
+			break
+		}
+
+		res := "prefered"
+		pos, scale := "auto", "auto"
+
+		if monitor.Res != nil {
+			res = fmt.Sprintf("%dx%d@%d", monitor.Res.Width, monitor.Res.Height, monitor.Res.RefreshRate)
+		}
+
+		if monitor.Pos != nil {
+			pos = fmt.Sprintf("%dx%d", monitor.Pos.X, monitor.Pos.Y)
+		}
+
+		if monitor.Scale != nil {
+			scale = fmt.Sprintf("%f", *monitor.Scale)
+		}
+
+		hyprStrs = append(hyprStrs, fmt.Sprintf("%s,%s,%s,%s", name, res, pos, scale))
+
+	}
+
+	return hyprStrs
 }

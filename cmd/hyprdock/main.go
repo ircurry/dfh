@@ -1,62 +1,126 @@
 package main
 
 import (
-	"flag"
+	"encoding/json"
 	"fmt"
 	"os"
 
 	"github.com/ircurry/dfh/internal/cli"
 	"github.com/ircurry/dfh/internal/ipc"
-	"github.com/ircurry/dfh/internal/monitors"
+	"github.com/ircurry/dfh/internal/monitors/profile"
 )
 
-func main() {
-	monsCmd := flag.NewFlagSet("monitors", flag.ExitOnError)
-	monsFile := monsCmd.String("f", "", "the json file to read monitor definitions from")
-	monsAllowUnconnected := monsCmd.Bool("a", false, "allow unconnected monitors to be configured")
-	monsExcludeDisable := monsCmd.Bool("exclude-disable", false, "do not disable other monitors")
+type earlyExit struct {
+	eeType    string
+	eeMessage string
+}
 
+func (e earlyExit) Error() string {
+	return e.eeMessage
+}
 
-	if len(os.Args) <= 1 {
-		cli.Die("Not enough arguments", cli.ArgumentError)
+type cliParseError struct {
+	eMessage string
+}
+
+func (e cliParseError) Error() string {
+	return e.eMessage
+}
+
+func newCliParseError(msg string) cliParseError {
+	return cliParseError{msg}
+}
+
+type cliArgs struct {
+	profile string
+}
+
+func newCliArgs() cliArgs {
+	return cliArgs{
+		profile: "",
 	}
-	monsCmd.Parse(os.Args[1:])
-	state := monsCmd.Arg(0)
-	if state == "" {
-		cli.Die("No state given", cli.MonitorStateFailure)
-	}
+}
 
-	contents, err := monitors.ReadMonitorConfigFile(*monsFile)
-	cli.DieIfErr("Unable to read file.", err, cli.ReadFileFailure)
-
-	var monl monitors.MonitorList
-	err = monl.FromJson(contents)
-	cli.DieIfErr("Something went wrong parsing config file",
-		err, cli.MonitorConfigParseFailure)
-	stateStrings, err := ipc.StateStrings(monl, state, *monsExcludeDisable)
-	cli.DieIfErr("Error creating hyprland monitor settings", err, cli.MonitorStateFailure)
-
-	wlrdata, err := ipc.WlrRandrJson()
-	cli.DieIfErr("Something went wrong requesting monitor information", err, cli.CommandExecutionError)
-	monitorNames, err := ipc.WlrRandrGetMonitors(wlrdata)
-	cli.DieIfErr("Could not get monitor names from program", err, cli.InfoRetrevalFailure)
-	allMonsPresent, err := monitors.CompareMonitorLists(monl, monitorNames)
-	cli.DieIfErr("Monitor name not found", err, cli.MonitorConfigParseFailure)
-
-	if !(allMonsPresent || *monsAllowUnconnected) {
-		monsCmd.Usage()
-		cli.Die("Not all monitors in config are present. Consider using the flag -a",
-			cli.InfoRetrevalFailure)
-	}
-
-	for _, str := range stateStrings {
-		fmt.Println(str)
-		// TODO: make this work with just IPC
-		if output, err := ipc.HyprctlExecCommand("keyword", "monitor", str); err != nil {
-			cli.DieErr("something went wrong executing hyprctl", err, cli.CommandExecutionError)
-		} else {
-			fmt.Print(string(output))
+func (c *cliArgs) parseArgs(args []string) error {
+	extraArgs := make([]string, 0)
+	for i := 0; i < len(args); i++ {
+		switch args[i] {
+		case "-h":
+			fallthrough
+		case "--help":
+			return earlyExit{
+				eeType:    "help",
+				eeMessage: "hyprdock <profile>\n",
+			}
+		default:
+			if c.profile == "" {
+				c.profile = args[i]
+			} else {
+				extraArgs = append(extraArgs, args[i])
+			}
 		}
 	}
-	return
+
+	if c.profile == "" {
+		return newCliParseError("No profile has been specified\n")
+	}
+	if len(extraArgs) != 0 {
+		extraArgsString := ""
+		for _, v := range extraArgs {
+			extraArgsString += fmt.Sprintf("  Unknown Argument: '%s'\n", v)
+		}
+		return newCliParseError(fmt.Sprintf("An issue occured while parsing arguments:\n" + extraArgsString))
+	}
+	return nil
+}
+
+func main() {
+	progArgs := newCliArgs()
+	err := progArgs.parseArgs(os.Args[1:])
+	if err != nil {
+		cli.Die(err.Error(), cli.CommandParseFailure)
+	}
+
+	configDir := ""
+	configDir, err = os.UserConfigDir()
+	if err != nil {
+		configDir, err = os.UserHomeDir()
+		if err != nil {
+			panic("Could not locate user home dir")
+		}
+		configDir += "/.config/nocturne"
+	}
+	configDir += "/nocturne"
+
+	configFileConents, err := os.ReadFile(configDir + "/monitors.json")
+	if err != nil {
+		errMsg := "Something when wrong reading monitor config file.\n" + err.Error()
+		cli.Die(errMsg, cli.ReadFileFailure)
+	}
+
+	var monitorConfig []profile.Profile
+	json.Unmarshal(configFileConents, &monitorConfig)
+
+	prflFound := false
+	for _, prfl := range monitorConfig {
+		if prfl.Name != progArgs.profile {
+			continue
+		}
+		prflFound = true
+		fmt.Printf("Configuring monitors according to profile \033[1;32m%s\033[0m.\n", prfl.Name)
+
+		hyprMonitorStrings := ipc.MonitorProfileToHyprlandString(prfl)
+		for _, hyprstr := range hyprMonitorStrings {
+			fmt.Printf("  Monitor '\033[1;33m%s\033[0m'\n", hyprstr)
+			output, err := ipc.HyprctlExecCommand("keyword", "monitor", hyprstr)
+			if err != nil {
+				errMsg := fmt.Sprintf("Something went wrong configuring monitor '\033[1;33m%s\033[0m'\n%s", hyprstr, string(output))
+				cli.Die(errMsg, cli.CommandExecutionError)
+			}
+		}
+		break
+	}
+	if !prflFound {
+		cli.Die(fmt.Sprintf("Could not find profile '\033[1;31m%s\033[0m'", progArgs.profile), cli.ArgumentError)
+	}
 }
