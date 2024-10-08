@@ -92,9 +92,14 @@ func main() {
 		}
 	}
 
-	for _, val := range foundMonitor {
+	for i, val := range foundMonitor {
 		if !val {
+			msg := fmt.Sprintf("Could not find monitor '\033[1;33m%s\033[0m'.\n", progArgs.monitors[i])
+			fmt.Fprint(os.Stderr, msg)
 			os.Exit(127)
+		} else {
+			msg := fmt.Sprintf("Found monitor '\033[1;33m%s\033[0m'.\n", progArgs.monitors[i])
+			fmt.Fprint(os.Stderr, msg)
 		}
 	}
 	
