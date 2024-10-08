@@ -7,46 +7,7 @@ import (
 	"os/exec"
 
 	"github.com/ircurry/dfh/internal/monitors"
-	"github.com/ircurry/dfh/internal/monitors/profile"
 )
-
-func hyprMonString(mon monitors.Monitor, state string) (string, bool) {
-	if mon.State == state {
-		var name, resolution, position, scale string
-
-		name = mon.Name
-		resolution = fmt.Sprintf("%dx%d@%d", mon.Width, mon.Height, mon.RefreshRate)
-		position = fmt.Sprintf("%dx%d", mon.X, mon.Y)
-		scale = fmt.Sprintf("%d", mon.Scale)
-
-		hyprstring := fmt.Sprintf("%s,%s,%s,%s", name, resolution, position, scale)
-		return hyprstring, true
-	} else {
-		return fmt.Sprintf("%s,disable", mon.Name), false
-	}
-
-}
-
-func StateStrings(monlist monitors.MonitorList, state string, excludeDisable bool) ([]string, error) {
-	strlist := make([]string, 0)
-	var stateErr error = nil
-	containsState := false
-	for _, mon := range monlist {
-		str, isState := hyprMonString(mon, state)
-		if isState || !excludeDisable {
-			strlist = append(strlist, str)
-		}
-		if isState {
-			containsState = true
-		}
-	}
-
-	if !containsState {
-		stateErr = fmt.Errorf("this monitor configuration does not contain state: %s", state)
-	}
-
-	return strlist, stateErr
-}
 
 func listenEvents(con net.Conn, lim int, ch chan string) {
 	b := make([]byte, 1)
@@ -139,7 +100,7 @@ func HyprctlExecCommand(args ...string) (output []byte, err error) {
 	return
 }
 
-func MonitorProfileToHyprlandString(prfl profile.Profile) []string {
+func MonitorProfileToHyprlandString(prfl monitors.Profile) []string {
 	hyprStrs := make([]string, 0)
 	for _, monitor := range prfl.Monitors {
 		name := ""

@@ -7,7 +7,7 @@ import (
 
 	"github.com/ircurry/dfh/internal/cli"
 	"github.com/ircurry/dfh/internal/ipc"
-	"github.com/ircurry/dfh/internal/monitors/profile"
+	"github.com/ircurry/dfh/internal/monitors"
 )
 
 type earlyExit struct {
@@ -98,7 +98,7 @@ func main() {
 		cli.Die(errMsg, cli.ReadFileFailure)
 	}
 
-	var monitorConfig []profile.Profile
+	var monitorConfig []monitors.Profile
 	json.Unmarshal(configFileConents, &monitorConfig)
 
 	prflFound := false
