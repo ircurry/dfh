@@ -120,8 +120,8 @@ profileLoop:
 		if prfl.Name != progArgs.profile {
 			continue
 		}
-		prflFound = true
 
+		prflFound = true
 		switch {
 		case progArgs.enabledMonitors:
 			enabledMons := make([]string, 0)
