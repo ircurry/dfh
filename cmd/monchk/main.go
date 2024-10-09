@@ -3,7 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
+	"strings"
 
 	"github.com/ircurry/dfh/internal/cli"
 	"github.com/ircurry/dfh/internal/ipc"
@@ -27,11 +29,13 @@ Usage:
 
 Options:
   -h, --help        display help information
+      --            read names from stdin, with each line being the name
 `
 
 type cliArgs struct {
 	monitors []string
-	help bool
+	help     bool
+	stdin    bool
 }
 
 func newCliArgs() cliArgs {
@@ -43,12 +47,25 @@ func newCliArgs() cliArgs {
 func (c *cliArgs) parseArgs(args []string) error {
 	for i := 0; i < len(args); i++ {
 		switch args[i] {
-		case "-h":
-			fallthrough
-		case "--help":
+		case "-h", "--help":
 			c.help = true
+		case "--":
+			c.stdin = true
 		default:
 			c.monitors = append(c.monitors, args[i])
+		}
+	}
+
+	if c.stdin {
+		bytes, err := io.ReadAll(os.Stdin)
+		if err != nil {
+			return err
+		}
+		mons := strings.Split(string(bytes), "\n")
+		for _, v := range mons {
+			if v != "" {
+				c.monitors = append(c.monitors, v)
+			}
 		}
 	}
 
@@ -64,6 +81,10 @@ func main() {
 	if progArgs.help {
 		fmt.Print(helpText)
 		os.Exit(0)
+	}
+	if (len(os.Args) <= 1) || !progArgs.stdin {
+		fmt.Print(helpText)
+		os.Exit(cli.CommandParseFailure)
 	}
 	output, err := ipc.HyprctlExecCommand("monitors", "-j")
 	if err != nil {
@@ -102,5 +123,5 @@ func main() {
 			fmt.Fprint(os.Stderr, msg)
 		}
 	}
-	
+
 }
