@@ -109,7 +109,7 @@ func MonitorProfileToHyprlandString(prfl monitors.Profile) []string {
 		}
 		if !monitor.Enabled {
 			hyprStrs = append(hyprStrs, fmt.Sprintf("%s,disabled", name))
-			break
+			continue
 		}
 
 		res := "prefered"
