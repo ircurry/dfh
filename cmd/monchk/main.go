@@ -78,24 +78,28 @@ func main() {
 	if err != nil {
 		cli.Die(err.Error(), cli.ArgumentError)
 	}
+
 	if progArgs.help {
 		fmt.Print(helpText)
 		os.Exit(0)
-	}
-	if (len(os.Args) <= 1) || !progArgs.stdin {
+	} else if (len(os.Args) < 2) && !progArgs.stdin {
 		fmt.Print(helpText)
 		os.Exit(cli.CommandParseFailure)
 	}
+
 	output, err := ipc.HyprctlExecCommand("monitors", "-j")
 	if err != nil {
 		errMsg := fmt.Sprintf("There was an \033[1;31merror\033[0m getting the list attached monitors.\n%s", err.Error())
 		cli.Die(errMsg, cli.CommandExecutionError)
 	}
-
 	monitors := make([]map[string]interface{}, 0)
-	json.Unmarshal(output, &monitors)
+	err = json.Unmarshal(output, &monitors)
+	if err != nil {
+		errMsg := "\033[31mFailed to parse JSON file.\033[0m\n" + err.Error()
+		cli.Die(errMsg, cli.MonitorConfigParseFailure)
+	}
 	if len(monitors) == 0 {
-		cli.Die("Failed to get monitor information.", cli.MonitorStateFailure)
+		cli.Die("Failed to get monitor information or information is blank.", cli.MonitorStateFailure)
 	}
 
 	foundMonitor := make([]bool, len(progArgs.monitors))
