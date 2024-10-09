@@ -131,11 +131,7 @@ profileLoop:
 				}
 			}
 			for i := 0; i < len(enabledMons); i++ {
-				if i+1 == len(enabledMons) {
-					fmt.Printf("%s\n", enabledMons[i])
-				} else {
-					fmt.Printf("%s ", enabledMons[i])
-				}
+				fmt.Printf("%s\n", enabledMons[i])
 			}
 			break profileLoop
 		case progArgs.disabledMonitors:
@@ -146,23 +142,14 @@ profileLoop:
 				}
 			}
 			for i := 0; i < len(disabledMons); i++ {
-				if i+1 == len(disabledMons) {
-					fmt.Printf("%s\n", disabledMons[i])
-				} else {
-					fmt.Printf("%s ", disabledMons[i])
-				}
+				fmt.Printf("%s\n", disabledMons[i])
 			}
 			break profileLoop
 		case progArgs.allMonitors:
 			for i := 0; i < len(prfl.Monitors); i++ {
 				monName := ""
 				if prfl.Monitors[i].Name != nil {
-					monName = fmt.Sprintf("%s", *prfl.Monitors[i].Name)
-				}
-				if i+1 != len(prfl.Monitors) && monName != "" {
-					monName += " "
-				} else if monName != "\n" {
-					monName += "\n"
+					monName = fmt.Sprintf("%s\n", *prfl.Monitors[i].Name)
 				}
 				fmt.Print(monName)
 			}
