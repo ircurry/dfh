@@ -1,9 +1,9 @@
 gomodule := 'github.com/ircurry/dfh'
 package := 'default'
 cmds := ```
-    dirs="$(find ./cmd/ -mindepth 1 -maxdepth 1 -type d)"
-    for dir in "$dirs"; do basename "$dir"; done
-	```
+    dirs="$(find ./cmd/ -mindepth 1 -maxdepth 1 -type d | awk 'BEGIN {ORS=" "}; {print $1}')"
+    for dir in $dirs; do basename "$dir" | awk 'BEGIN {ORS=" "}; {print $1}'; done
+```
 gofiles := ```
     find -regextype emacs -regex './[a-z]+.*\.go'
 	```
