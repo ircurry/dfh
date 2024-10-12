@@ -19,6 +19,7 @@ func main() {
 			ipc.HyprMessage("dispatch exec " + os.Args[2])
 			return
 		case "lsn":
+			lsnCmd.Parse(os.Args[2:])
 			ipc.HyprPrintEvents(*lsnNum)
 			return
 		}
