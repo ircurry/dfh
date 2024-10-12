@@ -51,6 +51,9 @@ func parseArgs(args []string) (cliArgs, error) {
 }
 
 func main() {
+	exitCode := 0
+	defer func() { os.Exit(exitCode) }()
+
 	progArgs, err := parseArgs(os.Args[1:])
 	switch (err) {
 	case nil:
@@ -58,7 +61,9 @@ func main() {
 	case flag.ErrHelp:
 		return
 	default:
-		cli.Die(err.Error(), cli.CommandParseFailure)
+		exitCode = cli.CommandExecutionError
+		fmt.Fprintln(os.Stderr, err.Error())
+		return
 	}
 
 	configDir := ""
@@ -75,7 +80,9 @@ func main() {
 	configFileConents, err := os.ReadFile(configDir + "/monitors.json")
 	if err != nil {
 		errMsg := "Something when wrong reading monitor config file.\n" + err.Error()
-		cli.Die(errMsg, cli.ReadFileFailure)
+		exitCode = cli.ReadFileFailure
+		fmt.Fprintln(os.Stderr, errMsg)
+		return
 	}
 
 	var monitorConfig []monitors.Profile
@@ -130,12 +137,16 @@ profileLoop:
 			output, err := ipc.HyprctlExecCommand("keyword", "monitor", hyprstr)
 			if err != nil {
 				errMsg := fmt.Sprintf("Something went wrong configuring monitor '\033[1;33m%s\033[0m'\n%s", hyprstr, string(output))
-				cli.Die(errMsg, cli.CommandExecutionError)
+				exitCode = cli.CommandExecutionError
+				fmt.Fprintln(os.Stderr, errMsg)
+				return
 			}
 		}
 		break
 	}
 	if !prflFound {
-		cli.Die(fmt.Sprintf("Could not find profile '\033[1;31m%s\033[0m'", progArgs.profile), cli.ArgumentError)
+		exitCode = cli.ArgumentError
+		fmt.Fprintln(os.Stderr, fmt.Sprintf("Could not find profile '\033[1;31m%s\033[0m'", progArgs.profile))
+		return
 	}
 }
