@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"os"
 
@@ -10,88 +11,54 @@ import (
 	"github.com/ircurry/dfh/internal/monitors"
 )
 
-type cliParseError struct {
-	eMessage string
-}
-
-func (e cliParseError) Error() string {
-	return e.eMessage
-}
-
-func newCliParseError(msg string) cliParseError {
-	return cliParseError{msg}
-}
-
-const helpText = `hyprdock - cli tool to easily configure tools
-Usage:
-  [options...] [monitors...]
-
-Options:
-  -h, --help                    display help information
-  -e, --enabled-monitors        print the names of monitors to be enabled in profile
-  -d, --disabled-monitors       print the names of monitors to be disabled in profile
-  -a, --all-monitors            print the names of all monitors specified in profile
-`
-
 type cliArgs struct {
 	profile          string
-	help             bool
 	enabledMonitors  bool
 	disabledMonitors bool
 	allMonitors      bool
 }
 
-func newCliArgs() cliArgs {
-	return cliArgs{
-		profile: "",
+func parseArgs(args []string) (cliArgs, error) {
+	progargs := cliArgs{}
+	flags := flag.NewFlagSet("hyprdock", flag.ContinueOnError)
+	flags.BoolVar(&progargs.enabledMonitors, "e", false, "print the names of monitors to be enabled in profile")
+	flags.BoolVar(&progargs.disabledMonitors, "d", false, "print the names of monitors to be disabled in profile")
+	flags.BoolVar(&progargs.allMonitors, "a", false, "print the names of all monitors specified in profile")
+	flags.BoolVar(&progargs.enabledMonitors, "enabled-monitors", false, "print the names of monitors to be enabled in profile")
+	flags.BoolVar(&progargs.disabledMonitors, "disabled-monitors", false, "print the names of monitors to be disabled in profile")
+	flags.BoolVar(&progargs.allMonitors, "all-monitors", false, "print the names of all monitors specified in profile")
+	flags.Usage = func() {
+		fmt.Fprint(os.Stderr, "Usage: hyprdock [options] <profile>\n")
+		flags.PrintDefaults()
 	}
-}
-
-func (c *cliArgs) parseArgs(args []string) error {
-	extraArgs := make([]string, 0)
-	for i := 0; i < len(args); i++ {
-		switch args[i] {
-		case "-h", "--help":
-			c.help = true
-			return nil
-		case "-e", "--enabled-monitors":
-			c.enabledMonitors = true
-		case "-d", "--disabled-monitors":
-			c.disabledMonitors = true
-		case "-a", "--all-monitors":
-			c.allMonitors = true
-		default:
-			if c.profile == "" {
-				c.profile = args[i]
-			} else {
-				extraArgs = append(extraArgs, args[i])
-			}
-		}
+	err := flags.Parse(args)
+	if err != nil {
+		return progargs, err
 	}
-
-	if c.profile == "" {
-		return newCliParseError("No profile has been specified\n")
+	switch len((flags.Args())) {
+	case 0:
+		fmt.Fprint(os.Stderr, "not enough arguments\n")
+		flags.Usage()
+		return progargs, nil
+	case 1:
+		progargs.profile = flags.Arg(0)
+		return progargs, nil
+	default:
+		fmt.Fprint(os.Stderr, "more than one profile name supplied, using first name given\n")
+		progargs.profile = flags.Arg(0)
+		return progargs, nil
 	}
-	if len(extraArgs) != 0 {
-		extraArgsString := ""
-		for _, v := range extraArgs {
-			extraArgsString += fmt.Sprintf("  Unknown Argument: '%s'\n", v)
-		}
-		return newCliParseError(fmt.Sprintf("An issue occured while parsing arguments:\n" + extraArgsString))
-	}
-	return nil
 }
 
 func main() {
-	progArgs := newCliArgs()
-	err := progArgs.parseArgs(os.Args[1:])
-	if err != nil {
+	progArgs, err := parseArgs(os.Args[1:])
+	switch (err) {
+	case nil:
+		break
+	case flag.ErrHelp:
+		return
+	default:
 		cli.Die(err.Error(), cli.CommandParseFailure)
-	}
-
-	if progArgs.help {
-		fmt.Print(helpText)
-		os.Exit(0)
 	}
 
 	configDir := ""
