@@ -29,7 +29,7 @@ func parseArgs(args []string) (cliArgs, error) {
 	flags.BoolVar(&progargs.allMonitors, "all-monitors", false, "print the names of all monitors specified in profile")
 	flags.Usage = func() {
 		fmt.Fprint(os.Stderr, "Usage: hyprdock [options] <profile>\n")
-		flags.PrintDefaults()
+		fmt.Fprint(os.Stderr, cli.Usage(flags))
 	}
 	err := flags.Parse(args)
 	if err != nil {

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/ircurry/dfh/internal/cli"
 	"github.com/ircurry/dfh/internal/ipc"
 )
 
@@ -24,7 +25,7 @@ func main() {
 	spwnCmd := flag.NewFlagSet("spwn", flag.ExitOnError)
 	spwnCmd.Usage = func() {
 		fmt.Print(spwnUsage)
-		spwnCmd.PrintDefaults()
+		fmt.Fprint(os.Stderr, cli.Usage(spwnCmd))
 	}
 	lsnCmd := flag.NewFlagSet("lsn", flag.ExitOnError)
 	lsnNum := lsnCmd.Uint("n", 0,
@@ -32,7 +33,7 @@ func main() {
 zero means output events until interupted which is the default behavior`)
 	lsnCmd.Usage = func() {
 		fmt.Print(lsnUsage)
-		lsnCmd.PrintDefaults()
+		fmt.Fprint(os.Stderr, cli.Usage(lsnCmd))
 	}
 
 	if len(os.Args) > 1 {
