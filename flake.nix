@@ -31,7 +31,7 @@
         }:
         {
           devenv.shells.default = {
-            packages = with pkgs; [ just gopls hyprland ];
+            packages = with pkgs; [ just gopls hyprland nixd ];
             languages.nix.enable = true;
             languages.go.enable = true;
             languages.go.enableHardeningWorkaround = true;
