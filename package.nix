@@ -27,6 +27,12 @@
           hyprland
         ]
       }"
+    wrapProgram $out/bin/monchk \
+      --prefix PATH : "${
+        lib.makeBinPath [
+          hyprland
+        ]
+      }"
   '';
 
   vendorHash = null;
