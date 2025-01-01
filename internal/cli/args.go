@@ -3,7 +3,6 @@ package cli
 import (
 	"flag"
 	"fmt"
-	"strings"
 )
 
 func Usage(flags *flag.FlagSet) string {
@@ -23,7 +22,6 @@ func Usage(flags *flag.FlagSet) string {
 	for i := 0; i < longest; i++ {
 		spacesStr += " "
 	}
-	nlPrefix := "\n   " + spacesStr + "    "
 	usage := ""
 	usageFn := func(flg *flag.Flag) {
 		name, rawUsage := flag.UnquoteUsage(flg)
@@ -36,8 +34,7 @@ func Usage(flags *flag.FlagSet) string {
 		for i := 0; i < offsetLen; i++ {
 			offset += " "
 		}
-		usage += fmt.Sprintf("  -%s%s    ", flgName, offset)
-		usage += strings.ReplaceAll(rawUsage, "\n", nlPrefix) + "\n"
+		usage += fmt.Sprintf("  -%s%s    ", flgName, offset) + rawUsage + "\n"
 	}
 	flags.VisitAll(usageFn)
 	return usage
